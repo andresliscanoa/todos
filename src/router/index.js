@@ -1,22 +1,31 @@
-import Vue from 'vue'
+import store     from '../store/index'
+import Vue       from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import Login     from '../views/Login.vue'
 
 Vue.use(VueRouter)
+const isAuth = ( to, from, next ) => {
+  Vue.http.headers.common['Authorization'] = localStorage.getItem( 'token' )
+  if ( store.getters.isAuth && localStorage.getItem( 'user' ) ) {
+    return next()
+  } else {
+    next( '/singIn' )
+    store.commit( 'removeAuth' )
+  }
+}
 
 const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home
+    path     : '/singIn',
+    name     : 'Login',
+    component: Login
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path       : '/',
+    name       : 'Home',
+    component  : () => import(/*webpackChunkName: "Home"*/'../views/Home'),
+    beforeEnter: isAuth,
+    children   : []
   }
 ]
 

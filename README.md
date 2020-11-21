@@ -1,6 +1,53 @@
-# todo
+# Todo Application
+See [Todos](https://todos.andresliscanoa.vercel.app)
 
-## Project setup
+## Description
+
+```
+ToDo application made with VueJS Framework
+Vuetify
+Vuex
+Vue-Router
+Components
+```
+
+### Task
+- Login
+    - [x] LocalStorage
+    - [x] Destroy persistence (Logout)
+- Dashboard
+    - [ ] Pending
+    - [ ] Overdue
+    - [ ] Finished
+- ToDo
+    - View Mode
+        - [ ] List
+        - [ ] Cards
+    - [ ] Filters
+    - [ ] Pagination
+    - Actions
+        - [ ] Create
+        - [ ] Update
+        - [ ] Delete
+- Categories
+    - [ ] Read
+    - Actions
+        - [ ] Create
+        - [ ] Update
+    - [ ] Pagination
+- Users
+    - [ ] Read
+    - Actions
+        - [ ] Create
+        - [ ] Update
+    - [ ] Pagination
+    - [ ] Roles
+- Profile
+    - [ ] Information page
+    - Actions
+        - [ ] Update
+
+### Project setup
 ```
 npm install
 ```
@@ -20,5 +67,7 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Env vars
+```
+- VUE_APP_API: Backend server url string
+```

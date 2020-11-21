@@ -1,15 +1,24 @@
-import Vue from 'vue'
+import Vue  from 'vue'
 import Vuex from 'vuex'
 
-Vue.use(Vuex)
+import Todos from '@/store/modules/Todos'
+import Users from '@/store/modules/Users'
 
-export default new Vuex.Store({
-  state: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
-  modules: {
-  }
-})
+Vue.use( Vuex )
+
+export default new Vuex.Store( {
+    state    : {
+        alert: false
+    },
+    getters  : {
+        getAlert: state => state.alert
+    },
+    mutations: {
+        setAlert( state, payload ) { state.alert = payload }
+    },
+    actions  : {},
+    modules  : {
+        Todos,
+        Users
+    }
+} )
