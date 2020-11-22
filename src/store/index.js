@@ -1,8 +1,9 @@
 import Vue  from 'vue'
 import Vuex from 'vuex'
 
-import Todos from '@/store/modules/Todos'
-import Users from '@/store/modules/Users'
+import Categories from '@/store/modules/Categories'
+import Todos      from '@/store/modules/Todos'
+import Users      from '@/store/modules/Users'
 
 Vue.use( Vuex )
 
@@ -18,6 +19,7 @@ export default new Vuex.Store( {
     },
     actions  : {},
     modules  : {
+        Categories,
         Todos,
         Users
     }
