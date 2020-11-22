@@ -2,7 +2,17 @@ import Vue from 'vue'
 
 const state = {
     Todos         : [],
-    Todo          : {},
+    Todo          : {
+        _id        : '',
+        title      : '',
+        description: '',
+        category   : {},
+        start      : '',
+        deadline   : '',
+        status     : 'Pending',
+        user       : {},
+        createdAt  : ''
+    },
     dashboard     : {
         pending : 0,
         overdue : 0,
@@ -27,6 +37,10 @@ const mutations = {
             return {
                 _id      : item._id,
                 title    : item.title,
+                category : {
+                    _id : item.category._id,
+                    name: item.category.name.charAt( 0 ).toUpperCase() + item.category.name.slice( 1 )
+                },
                 status   : item.status,
                 user     : item.user,
                 createdAt: item.createdAt.replace( 'T', ' ' ).substr( 0, 19 )
@@ -42,7 +56,6 @@ const actions = {
         return await Vue.http.get( `todos/dash?user=${ user }` )
             .then( res => {
                 if ( res.status === 200 ) {
-                    console.log( res.body.response )
                     const pending = res.body.response.find( item => item._id === 'Pending' ) || { count: 0 }
                     const overdue = res.body.response.find( item => item._id === 'Overdue' ) || { count: 0 }
                     const finished = res.body.response.find( item => item._id === 'Finished' ) || { count: 0 }
@@ -78,6 +91,36 @@ const actions = {
                     commit( 'setTodoPagination', res.body.response.pagination )
                     commit( 'setTodos', res.body.response.data )
                 }
+                return res
+            } )
+            .catch( err => {
+                return err
+            } )
+    },
+    async getTodoById( { commit }, payload ) {
+        return await Vue.http.get( `todos/one/${ payload.id }?user=${ payload.user }` )
+            .then( res => {
+                if ( res.status === 200 ) {
+                    commit( 'setTodo', res.body.response )
+                }
+                return res
+            } )
+            .catch( err => {
+                return err
+            } )
+    },
+    async createTodo( _, todo ) {
+        return await Vue.http.post( 'todos', todo )
+            .then( res => {
+                return res
+            } )
+            .catch( err => {
+                return err
+            } )
+    },
+    async updateTodos( _, todo ) {
+        return await Vue.http.put( 'todos', todo )
+            .then( res => {
                 return res
             } )
             .catch( err => {

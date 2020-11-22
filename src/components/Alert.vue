@@ -3,11 +3,12 @@
     <v-snackbar
         v-model="alert"
         :color="color"
-        :timeout="timeOut" bottom
+        bottom
         elevation="24"
         max-width="35rem"
         min-width="25rem"
         right
+        timeout="-1"
     >
       <v-layout justify-space-around row wrap>
         <template>
@@ -69,9 +70,9 @@ export default {
       type   : String,
       default: 'green'
     },
-    timeOut: {
-      type   : Number,
-      default: -1
+    icon   : {
+      type   : String,
+      default: 'mdi-check'
     },
     status : {
       type   : String,
@@ -94,9 +95,6 @@ export default {
     ...mapGetters( [ 'getAlert' ] ),
     alert() {
       return this.getAlert
-    },
-    icon() {
-      return status === 'success' ? `mdi-check` : `mdi-alert`
     }
   },
   methods : {

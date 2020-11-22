@@ -1,7 +1,7 @@
 <template>
   <v-layout justify-space-around row wrap>
-    <alert :color="colorAlert" :errors="errorsAlert" :info="infoAlert" :message="messageAlert" :status="statusAlert"
-           :timeOut="10000"/>
+    <alert :color="colorAlert" :errors="errorsAlert" :icon="iconAlert" :info="infoAlert" :message="messageAlert"
+           :status="statusAlert"/>
     <v-flex lg5 mt-10 pt-10 sm6 xl3 xs12>
       <v-card class="white--text gradient" elevation="10" height="30rem" outlined>
         <v-card-text>
@@ -79,6 +79,7 @@ export default {
     password    : '',
     loading     : false,
     colorAlert  : '',
+    iconAlert   : '',
     messageAlert: '',
     statusAlert : '',
     errorsAlert : '' || [],
@@ -155,9 +156,10 @@ export default {
               this.loading = false
               if ( res.status === 200 ) {
                 this.$router.push( '/' )
-              } else {
+              } else if ( res.status === 400 ) {
                 this.setAlert( true )
                 this.colorAlert = 'red'
+                this.iconAlert = 'mdi-alert'
                 this.statusAlert = res.body.status
                 this.messageAlert = res.body.message
                 this.errorsAlert = res.body.response && res.body.response.err || null
