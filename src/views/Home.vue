@@ -32,13 +32,13 @@
         </v-app-bar>
         <v-card-text v-show="showDash">
           <v-layout justify-space-around row wrap>
-            <v-flex lg3 md4 xs12>
+            <v-flex lg2 md4 xs12>
               <dash-board-card :total="totalPending" color="pink lighten-2" title="Pending"/>
             </v-flex>
-            <v-flex lg3 md4 xs12>
+            <v-flex lg2 md4 xs12>
               <dash-board-card :total="totalOverdue" color="orange" title="Overdue"/>
             </v-flex>
-            <v-flex lg3 md4 xs12>
+            <v-flex lg2 md4 xs12>
               <dash-board-card :total="totalFinished" color="teal lighten-2" title="Finished"/>
             </v-flex>
           </v-layout>
@@ -162,8 +162,8 @@
             </v-flex>
             <v-flex xs12>
               <v-layout justify-center row wrap>
-                <v-layout class="px-10" justify-start row wrap>
-                  <v-flex xs1>
+                <v-layout class="px-5" justify-start row wrap>
+                  <v-flex md1 sm2 xs5>
                     <v-tooltip bottom color="purple lighten-3">
                       <template v-slot:activator="{on}">
                         <v-btn v-on="on" :color="listViews ? 'purple' : 'white'" dark icon outlined
@@ -174,7 +174,7 @@
                       <span class="text-caption">LIST VIEW</span>
                     </v-tooltip>
                   </v-flex>
-                  <v-flex xs1>
+                  <v-flex md1 sm2 xs5>
                     <v-tooltip bottom color="purple lighten-3">
                       <template v-slot:activator="{on}">
                         <v-btn v-on="on" :color="cardViews ? 'purple' : 'white'" dark icon outlined
@@ -186,10 +186,10 @@
                     </v-tooltip>
                   </v-flex>
                 </v-layout>
-                <v-flex xs1>
+                <v-flex lg1 md2 sm2 xs3>
                   <v-btn dark text @click.native="filterTodos()">Search</v-btn>
                 </v-flex>
-                <v-flex xs1>
+                <v-flex lg1 md2 sm2 xs3>
                   <v-btn color="red darken-4" dark text @click.native="resetFilters()">Reset</v-btn>
                 </v-flex>
               </v-layout>
@@ -213,25 +213,36 @@
             hide-default-footer
         >
           <template v-slot:item.actions="{ item }">
-            <v-layout justify-space-around row>
-              <v-flex xs1>
+            <v-layout class="px-5" justify-space-around row>
+              <v-flex md2 sm4 xs1>
                 <v-tooltip color="purple lighten-3" left>
                   <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" icon @click.native="openTodoDialogShow(item._id)">
+                    <v-btn v-on="on" color="blue" icon @click.native="openTodoDialogShow(item._id)">
                       <v-icon>mdi-eye</v-icon>
                     </v-btn>
                   </template>
                   <span>Open task</span>
                 </v-tooltip>
               </v-flex>
-              <v-flex class="hidden-xs-only" xs1>
-                <v-tooltip color="purple lighten-3" right>
+              <v-flex class="hidden-xs-only" md2 sm4 xs1>
+                <v-tooltip bottom color="purple lighten-3">
                   <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" icon>
+                    <v-btn v-on="on" color="pink" icon>
                       <v-icon>mdi-autorenew</v-icon>
                     </v-btn>
                   </template>
                   <span>Update status</span>
+                </v-tooltip>
+              </v-flex>
+              <v-flex md2 sm4 xs1>
+                <v-tooltip color="purple lighten-3" right>
+                  <template v-slot:activator="{ on }">
+                    <v-btn v-on="on" :loading="deleteLoading" color="red darken-4" icon
+                           @click.native="deleteTodo(item._id)">
+                      <v-icon>mdi-delete</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Delete task</span>
                 </v-tooltip>
               </v-flex>
             </v-layout>
@@ -259,14 +270,15 @@
               :title="todo.title"
               :userTodo="todo.user"
               @openTodoDialogShow="openTodoDialogShow($event)"
+              @deleteTodo="deleteTodo($event)"
           />
         </v-flex>
       </v-layout>
       <v-layout justify-end row wrap>
-        <v-flex mt-3 xs2>
+        <v-flex lg2 mt-3 sm2 xs4>
           <span class="text-caption">TOTAL ITEMS: {{ todoPagination.total }}</span>
         </v-flex>
-        <v-flex mx-5 xs1>
+        <v-flex lg1 mx-5 sm2 xs4>
           <v-select
               v-model="itemsPagination"
               :items="itemsPerPage"
@@ -291,7 +303,7 @@
     </v-flex>
     <alert :color="colorAlert" :errors="errorsAlert" :icon="iconAlert" :info="infoAlert" :message="messageAlert"
            :status="statusAlert"/>
-    <floating-button-menu/>
+    <floating-button-menu class="hidden-sm-and-down"/>
     <v-dialog
         v-model="todoDialog"
         hide-overlay
@@ -301,6 +313,7 @@
       <todo-create-update :create="todoCreate" :show="todoShow" @closeTodoDialog="closeTodoDialog"
                           @showConfirmAlert="showConfirmAlert($event)" @showErrorAlert="showErrorAlert($event)"/>
     </v-dialog>
+    <loader v-if="loader"/>
   </v-layout>
 </template>
 
@@ -309,6 +322,7 @@ import { mapGetters, mapMutations, mapActions } from 'vuex'
 import Alert                                    from '@/components/Alert'
 import DashBoardCard                            from '@/components/DashBoardCard'
 import FloatingButtonMenu                       from '@/components/FloatingButtonMenu'
+import Loader                                   from '@/components/Loader'
 import TodoCard                                 from '@/components/TodoCard'
 import TodoCreateUpdate                         from '@/components/TodoCreateUpdate'
 
@@ -318,6 +332,7 @@ export default {
     Alert,
     DashBoardCard,
     FloatingButtonMenu,
+    Loader,
     TodoCard,
     TodoCreateUpdate
   },
@@ -347,6 +362,8 @@ export default {
     itemsPerPage   : [ 10, 25, 50, 100 ],
     page           : 1,
     loading        : false,
+    deleteLoading  : false,
+    loader         : false,
     listViews      : true,
     cardViews      : false,
     todoDialog     : false,
@@ -372,7 +389,7 @@ export default {
   },
   methods   : {
     ...mapMutations( [ 'setAlert', 'setTodo' ] ),
-    ...mapActions( [ 'getTodoDashboard', 'findCategoriesByUser', 'getTodosByFilters', 'getTodoById' ] ),
+    ...mapActions( [ 'getTodoDashboard', 'findCategoriesByUser', 'getTodosByFilters', 'getTodoById', 'updateTodosStatus', 'deleteTodos' ] ),
     async dash() {
       await this.getTodoDashboard( this.user._id )
     },
@@ -462,15 +479,30 @@ export default {
       this.todoShow = false
     },
     async openTodoDialogShow( payload ) {
+      this.loader = true
       const find = {
         id  : payload,
         user: this.user._id
       }
       await this.getTodoById( find )
           .then( res => {
+            this.loader = false
             if ( res.status === 200 ) {
               this.todoDialog = true
               this.todoShow = true
+            }
+          } )
+    },
+    async deleteTodo( payload ) {
+      this.deleteLoading = true
+      const todo = { id: payload }
+      await this.deleteTodos( todo )
+          .then( res => {
+            this.deleteLoading = false
+            if ( res.status === 200 ) {
+              this.showConfirmAlert( res.body )
+            } else if ( res.status === 400 ) {
+              this.showErrorAlert( res.body )
             }
           } )
     }

@@ -126,6 +126,25 @@ const actions = {
             .catch( err => {
                 return err
             } )
+    },
+    async updateTodosStatus( _, todo ) {
+        return await Vue.http.put( 'todos/status', todo )
+            .then( res => {
+                return res
+            } )
+            .catch( err => {
+                return err
+            } )
+    },
+    async deleteTodos( _, todo ) {
+        console.log( todo )
+        return await Vue.http.delete( 'todos', { body: todo } )
+            .then( res => {
+                return res
+            } )
+            .catch( err => {
+                return err
+            } )
     }
 }
 

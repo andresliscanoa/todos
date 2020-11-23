@@ -1,7 +1,8 @@
 <template>
   <v-card :color="color" dark outlined>
     <v-app-bar color="transparent" flat>
-      <v-toolbar-title><span class="text-button">{{ title }}</span></v-toolbar-title>
+      <v-toolbar-title><span class="text-button d-inline-block text-truncate max-title-length">{{ title }}</span>
+      </v-toolbar-title>
       <v-spacer/>
       <v-btn
           dark
@@ -21,8 +22,16 @@
         </v-flex>
       </v-layout>
       <v-spacer/>
-      <v-btn dark icon>
-        <v-icon>mdi-update</v-icon>
+      <v-btn dark icon x-small>
+        <v-icon>mdi-autorenew</v-icon>
+      </v-btn>
+      <v-btn
+          dark
+          icon
+          x-small
+          @click.native="$emit('deleteTodo',_id)"
+      >
+        <v-icon>mdi-delete</v-icon>
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -80,3 +89,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+.max-title-length {
+  max-width: 190px;
+}
+</style>

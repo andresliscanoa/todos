@@ -3,7 +3,7 @@
     <v-app-bar color="transparent" flat>
       <v-toolbar-title>
         <span v-if="show&&!updateTodo" class="text--button">
-          {{ todo.title }}
+          {{ todo.title.charAt( 0 ).toUpperCase() + todo.title.slice( 1 ) }}
         </span>
         <span v-if="updateTodo" class="text--button">
           Update Todo
