@@ -16,19 +16,19 @@ Components
     - [x] LocalStorage
     - [x] Destroy persistence (Logout)
 - Dashboard
-    - [ ] Pending
-    - [ ] Overdue
-    - [ ] Finished
+    - [x] Pending
+    - [x] Overdue
+    - [x] Finished
 - ToDo
     - View Mode
-        - [ ] List
-        - [ ] Cards
-    - [ ] Filters
-    - [ ] Pagination
+        - [x] List
+        - [x] Cards
+    - [x] Filters
+    - [x] Pagination
     - Actions
-        - [ ] Create
+        - [x] Create
         - [ ] Update
-        - [ ] Delete
+        - [x] Delete
 - Categories
     - [ ] Read
     - Actions
