@@ -5,7 +5,6 @@
         color="amber"
         dark
     >
-      <v-app-bar-nav-icon class="hidden-md-and-up"></v-app-bar-nav-icon>
       <v-spacer/>
       <v-btn
           href="https://github.com/andresliscanoa/todos"
@@ -29,13 +28,8 @@
 </template>
 
 <script>
-
-
 export default {
   name    : 'App',
-  data    : () => ({
-    //
-  }),
   computed: {
     year() {
       return new Date().getFullYear()

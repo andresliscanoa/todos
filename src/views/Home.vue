@@ -1,5 +1,22 @@
 <template>
   <v-layout justify-space-around row wrap>
+    <v-flex class="hidden-md-and-up" mb-3 xs12>
+      <v-layout justify-center row wrap>
+        <v-flex sm6 xs10>
+          <v-app-bar color="transparent" flat>
+            <v-toolbar-items>
+              <v-btn color="blue" text><span class="text-caption">PROFILE</span></v-btn>
+              <v-divider vertical></v-divider>
+              <v-btn color="orange" text><span class="text-caption">CATEGORIES</span></v-btn>
+              <v-divider v-if="user.rol.name === 'admin'" vertical></v-divider>
+              <v-btn v-if="user.rol.name === 'admin'" color="red" text><span class="text-caption">ADMIN</span></v-btn>
+              <v-divider vertical></v-divider>
+              <v-btn color="red darken-4" text><span class="text-caption">LOGOUT</span></v-btn>
+            </v-toolbar-items>
+          </v-app-bar>
+        </v-flex>
+      </v-layout>
+    </v-flex>
     <v-flex mx-10 xs12>
       <v-card color="purple lighten-4" flat>
         <v-app-bar color="transparent" dark flat>
@@ -214,7 +231,15 @@
         >
           <template v-slot:item.actions="{ item }">
             <v-layout class="px-5" justify-space-around row>
-              <v-flex md2 sm4 xs1>
+              <v-flex v-if="item.status!=='Finished'" class="hidden-xs-only" md2 sm4 xs1>
+                <v-checkbox
+                    :key="item._id"
+                    v-model="item.selected"
+                    :loading="updateLoading"
+                    @click.native="setStatusTodo(item._id)"
+                />
+              </v-flex>
+              <v-flex md2 pt-3 sm4 xs1>
                 <v-tooltip color="purple lighten-3" left>
                   <template v-slot:activator="{ on }">
                     <v-btn v-on="on" color="blue" icon @click.native="openTodoDialogShow(item._id)">
@@ -224,17 +249,7 @@
                   <span>Open task</span>
                 </v-tooltip>
               </v-flex>
-              <v-flex class="hidden-xs-only" md2 sm4 xs1>
-                <v-tooltip bottom color="purple lighten-3">
-                  <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" color="pink" icon>
-                      <v-icon>mdi-autorenew</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Update status</span>
-                </v-tooltip>
-              </v-flex>
-              <v-flex md2 sm4 xs1>
+              <v-flex md2 pt-3 sm4 xs1>
                 <v-tooltip color="purple lighten-3" right>
                   <template v-slot:activator="{ on }">
                     <v-btn v-on="on" :loading="deleteLoading" color="red darken-4" icon
@@ -338,6 +353,7 @@ export default {
   },
   data      : () => ({
     showDash       : true,
+    todoCheck      : false,
     category       : {},
     status         : '',
     start          : '',
@@ -363,6 +379,7 @@ export default {
     page           : 1,
     loading        : false,
     deleteLoading  : false,
+    updateLoading  : false,
     loader         : false,
     listViews      : true,
     cardViews      : false,
@@ -490,6 +507,22 @@ export default {
             if ( res.status === 200 ) {
               this.todoDialog = true
               this.todoShow = true
+            }
+          } )
+    },
+    async setStatusTodo( id ) {
+      const payload = {
+        id,
+        status: 'Finished'
+      }
+      this.updateLoading = true
+      await this.updateTodosStatus( payload )
+          .then( res => {
+            this.updateLoading = false
+            if ( res.status === 200 ) {
+              this.showConfirmAlert( res.body )
+            } else if ( res.status === 400 ) {
+              this.showErrorAlert( res.body )
             }
           } )
     },
