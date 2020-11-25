@@ -205,7 +205,7 @@ export default {
   }),
   computed: {
     ...mapGetters( [ 'getCategoriesFilter', 'getUser', 'getTodo' ] ),
-    categoriesFilter() { return this.getCategoriesFilter },
+    categoriesFilter() { return this.getCategoriesFilter.filter( item => item.status === true ) },
     minDeadline() {
       return this.todo.start ? this.todo.start : '2020-11-01'
     },

@@ -22,15 +22,16 @@ const mutations = {
             return {
                 _id   : item._id,
                 name  : item.name.charAt( 0 ).toUpperCase() + item.name.slice( 1 ),
-                status: item.status
+                status: item.status ? 'Active' : 'Disabled'
             }
         } )
     },
     setCategoriesFilter( state, payload ) {
         state.CategoriesFilter = payload.map( item => {
             return {
-                _id : item._id,
-                name: item.name.charAt( 0 ).toUpperCase() + item.name.slice( 1 )
+                _id   : item._id,
+                name  : item.name.charAt( 0 ).toUpperCase() + item.name.slice( 1 ),
+                status: item.status
             }
         } )
     },
@@ -51,6 +52,15 @@ const actions = {
                     commit( 'setCategories', [] )
                     commit( 'setCategoryPagination', { total: 0, perPage: 10, pages: 1 } )
                 }
+                return res
+            } )
+            .catch( err => {
+                return err
+            } )
+    },
+    async updateCategoriesById( _, category ) {
+        return await Vue.http.put( `categories`, category )
+            .then( res => {
                 return res
             } )
             .catch( err => {

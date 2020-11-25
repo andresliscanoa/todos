@@ -44,6 +44,7 @@
             dark
             fab
             small
+            @click.native="$emit('showCategoriesSheet')"
         >
           <v-icon>mdi-book-variant</v-icon>
         </v-btn>

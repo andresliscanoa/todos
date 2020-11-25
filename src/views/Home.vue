@@ -316,9 +316,18 @@
         />
       </div>
     </v-flex>
+    <v-flex md6 xs12>
+      <v-bottom-sheet
+          v-model="showCategories"
+          inset
+          persistent
+      >
+        <categories @closeCategoriesSheet="showCategories = false"/>
+      </v-bottom-sheet>
+    </v-flex>
     <alert :color="colorAlert" :errors="errorsAlert" :icon="iconAlert" :info="infoAlert" :message="messageAlert"
            :status="statusAlert"/>
-    <floating-button-menu class="hidden-sm-and-down"/>
+    <floating-button-menu class="hidden-sm-and-down" @showCategoriesSheet="showCategories = true"/>
     <v-dialog
         v-model="todoDialog"
         hide-overlay
@@ -335,6 +344,7 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import Alert                                    from '@/components/Alert'
+import Categories                               from '@/views/Categories'
 import DashBoardCard                            from '@/components/DashBoardCard'
 import FloatingButtonMenu                       from '@/components/FloatingButtonMenu'
 import Loader                                   from '@/components/Loader'
@@ -345,6 +355,7 @@ export default {
   name      : 'Home',
   components: {
     Alert,
+    Categories,
     DashBoardCard,
     FloatingButtonMenu,
     Loader,
@@ -353,6 +364,7 @@ export default {
   },
   data      : () => ({
     showDash       : true,
+    showCategories : false,
     todoCheck      : false,
     category       : {},
     status         : '',
