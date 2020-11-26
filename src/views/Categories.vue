@@ -6,7 +6,7 @@
           <v-app-bar color="transparent" flat>
             <v-toolbar-title>
               <span class="text-subtitle-1 px-5">CATEGORIES</span>
-              <v-btn icon>
+              <v-btn icon @click.native="createCategory = true">
                 <v-icon>mdi-plus</v-icon>
               </v-btn>
             </v-toolbar-title>
@@ -112,14 +112,24 @@
         </v-card>
       </v-flex>
     </v-layout>
+    <v-dialog
+        v-model="createCategory"
+        width="30rem"
+    >
+      <category-create @closeCreateCategory="closeCreateCategory"/>
+    </v-dialog>
   </v-sheet>
 </template>
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
+import CategoryCreate                           from '@/components/CategoryCreate'
 
 export default {
-  name    : 'Categories',
-  data    : () => ({
+  name      : 'Categories',
+  components: {
+    CategoryCreate
+  },
+  data      : () => ({
     category       : {
       name: ''
     },
@@ -131,29 +141,32 @@ export default {
       { text: 'Status', align: 'center', sortable: 'false', value: 'status' }
     ],
     itemStatus     : [ 'Active', 'Disabled' ],
-    itemsPerPage   : [ 10, 25, 50, 100 ]
+    itemsPerPage   : [ 10, 25, 50, 100 ],
+    createCategory : false
   }),
-  computed: {
+  computed  : {
     ...mapGetters( [ 'getCategories', 'getCategoryPagination' ] ),
     categories() { return this.getCategories },
     pagination() { return this.getCategoryPagination }
   },
-  methods : {
-    ...mapMutations( [ 'setAlert' ] ),
+  methods   : {
+    ...mapMutations( [ 'setConfirmAlert', 'setErrorAlert', 'setAlertOff' ] ),
     ...mapActions( [ 'findCategoriesByUser', 'updateCategoriesById' ] ),
     async save( item ) {
       const category = {
         id    : item._id,
         name  : item.name,
-        status: item.status === 'Active'
+        status: item.status === 'Active' ? 'true' : 'false'
       }
       await this.updateCategoriesById( category )
           .then( res => {
             if ( res.status === 200 ) {
-              this.showConfirmAlert( res.body )
+              this.setConfirmAlert( res.body )
+              setTimeout( () => this.setAlertOff(), 4000 )
               this.getAllCategories()
             } else if ( res.status === 400 ) {
-              this.showErrorAlert( res.body )
+              this.setErrorAlert( res.body )
+              this.getAllCategories()
             }
           } )
     },
@@ -164,33 +177,13 @@ export default {
         page : this.page
       }
       await this.findCategoriesByUser( query )
-          .then( res => {
+          .then( () => {
             this.loading = false
-            if ( res.status === 200 ) {
-              this.showConfirmAlert( res.body )
-            } else if ( res.status === 400 ) {
-              this.showErrorAlert( res.body )
-            }
           } )
     },
-    showConfirmAlert( payload ) {
-      this.setAlert( true )
-      this.colorAlert = 'green'
-      this.iconAlert = 'mdi-check'
-      this.statusAlert = payload.status
-      this.messageAlert = payload.message
-      this.errorsAlert = null
-      this.infoAlert = null
-      setTimeout( () => this.setAlert( false ), 4000 )
-    },
-    showErrorAlert( payload ) {
-      this.setAlert( true )
-      this.colorAlert = 'red'
-      this.iconAlert = 'mdi-alert'
-      this.statusAlert = payload.status
-      this.messageAlert = payload.message
-      this.errorsAlert = payload.response && payload.response.err || null
-      this.infoAlert = payload.response && payload.response.info || null
+    closeCreateCategory() {
+      this.createCategory = false
+      this.getAllCategories()
     }
   }
 }

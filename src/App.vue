@@ -24,16 +24,19 @@
       <v-spacer/>
       <span class="text-button"><strong>&copy;{{ year }}</strong></span>
     </v-footer>
+    <alert/>
   </v-app>
 </template>
 
 <script>
+import Alert from '@/components/Alert'
 export default {
-  name    : 'App',
-  computed: {
-    year() {
-      return new Date().getFullYear()
-    }
+  name      : 'App',
+  components: {
+    Alert
+  },
+  computed  : {
+    year() { return new Date().getFullYear() }
   }
 }
 </script>

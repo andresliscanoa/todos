@@ -137,7 +137,6 @@ const actions = {
             } )
     },
     async deleteTodos( _, todo ) {
-        console.log( todo )
         return await Vue.http.delete( 'todos', { body: todo } )
             .then( res => {
                 return res

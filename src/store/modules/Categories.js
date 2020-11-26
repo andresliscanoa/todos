@@ -39,6 +39,15 @@ const mutations = {
     setCategoryPagination( state, payload ) { state.categoryPagination = payload }
 }
 const actions = {
+    async categoryUniqueName( _, name ) {
+        return await Vue.http.get( `categories/unique/name?value=${ name }` )
+            .then( res => {
+                return res
+            } )
+            .catch( err => {
+                return err
+            } )
+    },
     async findCategoriesByUser( { commit }, query ) {
         const { items, page } = query
         return await Vue.http.get( `categories?items=${ items }&page=${ page }` )
@@ -52,6 +61,15 @@ const actions = {
                     commit( 'setCategories', [] )
                     commit( 'setCategoryPagination', { total: 0, perPage: 10, pages: 1 } )
                 }
+                return res
+            } )
+            .catch( err => {
+                return err
+            } )
+    },
+    async createCategories( _, name ) {
+        return await Vue.http.post( 'categories', name )
+            .then( res => {
                 return res
             } )
             .catch( err => {

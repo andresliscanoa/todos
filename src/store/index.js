@@ -9,13 +9,47 @@ Vue.use( Vuex )
 
 export default new Vuex.Store( {
     state    : {
-        alert: false
+        alert: {
+            alert  : false,
+            color  : 'transparent',
+            icon   : '',
+            status : '',
+            message: '',
+            errors : [],
+            info   : {}
+        }
     },
     getters  : {
         getAlert: state => state.alert
     },
     mutations: {
-        setAlert( state, payload ) { state.alert = payload }
+        setErrorAlert( state, payload ) {
+            state.alert.alert = true
+            state.alert.color = 'red'
+            state.alert.icon = 'mdi-alert'
+            state.alert.status = payload.status
+            state.alert.message = payload.message
+            state.alert.errors = payload.errors
+            state.alert.info = payload.info
+        },
+        setConfirmAlert( state, payload ) {
+            state.alert.alert = true
+            state.alert.color = 'green'
+            state.alert.icon = 'mdi-check'
+            state.alert.status = payload.status
+            state.alert.message = payload.message
+            state.alert.errors = null
+            state.alert.info = null
+        },
+        setAlertOff( state ) {
+            state.alert.alert = false
+            state.alert.color = 'transparent'
+            state.alert.icon = ''
+            state.alert.status = ''
+            state.alert.message = ''
+            state.alert.errors = []
+            state.alert.info = {}
+        }
     },
     actions  : {},
     modules  : {

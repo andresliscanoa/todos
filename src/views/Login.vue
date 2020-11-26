@@ -1,7 +1,5 @@
 <template>
   <v-layout justify-space-around row wrap>
-    <alert :color="colorAlert" :errors="errorsAlert" :icon="iconAlert" :info="infoAlert" :message="messageAlert"
-           :status="statusAlert"/>
     <v-flex lg5 mt-10 pt-10 sm6 xl3 xs12>
       <v-card class="white--text gradient" elevation="10" height="30rem" outlined>
         <v-card-text>
@@ -65,25 +63,13 @@
 </template>
 <script>
 import { required, minLength, maxLength, email } from 'vuelidate/lib/validators'
-import { mapGetters, mapMutations, mapActions }  from 'vuex'
-
-const Alert = () => import( '@/components/Alert' )
-
+import { mapMutations, mapActions }              from 'vuex'
 export default {
   name       : 'Login',
-  components : {
-    Alert
-  },
   data       : () => ({
     email       : '',
     password    : '',
     loading     : false,
-    colorAlert  : '',
-    iconAlert   : '',
-    messageAlert: '',
-    statusAlert : '',
-    errorsAlert : '' || [],
-    infoAlert   : {}
   }),
   validations: {
     email   : {
@@ -99,10 +85,6 @@ export default {
     }
   },
   computed   : {
-    ...mapGetters( [ 'getAlert' ] ),
-    alert() {
-      return this.getAlert
-    },
     disabled() {
       if ( this.$v.email.$invalid || this.$v.password.$invalid ) {
         return true
@@ -142,7 +124,7 @@ export default {
     }
   },
   methods    : {
-    ...mapMutations( [ 'setAlert', 'setUser' ] ),
+    ...mapMutations( [ 'setErrorAlert', 'setUser' ] ),
     ...mapActions( [ 'singIn' ] ),
     async login() {
       if ( !this.disabled ) {
@@ -157,13 +139,7 @@ export default {
               if ( res.status === 200 ) {
                 this.$router.push( '/' )
               } else if ( res.status === 400 ) {
-                this.setAlert( true )
-                this.colorAlert = 'red'
-                this.iconAlert = 'mdi-alert'
-                this.statusAlert = res.body.status
-                this.messageAlert = res.body.message
-                this.errorsAlert = res.body.response && res.body.response.err || null
-                this.infoAlert = res.body.response && res.body.response.info || null
+                this.setErrorAlert( res.body )
               }
             } )
       }

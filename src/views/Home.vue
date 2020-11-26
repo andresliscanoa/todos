@@ -325,8 +325,6 @@
         <categories @closeCategoriesSheet="showCategories = false"/>
       </v-bottom-sheet>
     </v-flex>
-    <alert :color="colorAlert" :errors="errorsAlert" :icon="iconAlert" :info="infoAlert" :message="messageAlert"
-           :status="statusAlert"/>
     <floating-button-menu class="hidden-sm-and-down" @showCategoriesSheet="showCategories = true"/>
     <v-dialog
         v-model="todoDialog"
@@ -343,7 +341,6 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import Alert                                    from '@/components/Alert'
 import Categories                               from '@/views/Categories'
 import DashBoardCard                            from '@/components/DashBoardCard'
 import FloatingButtonMenu                       from '@/components/FloatingButtonMenu'
@@ -354,7 +351,6 @@ import TodoCreateUpdate                         from '@/components/TodoCreateUpd
 export default {
   name      : 'Home',
   components: {
-    Alert,
     Categories,
     DashBoardCard,
     FloatingButtonMenu,
@@ -373,17 +369,17 @@ export default {
     end            : '',
     menuEnd        : false,
     itemStatus     : [ 'Pending', 'Overdue', 'Finished' ],
-    colorAlert     : '',
-    iconAlert      : '',
-    messageAlert   : '',
-    statusAlert    : '',
-    errorsAlert    : '' || [],
-    infoAlert      : {},
-    headers        : [
+    headersAdmin   : [
       { text: 'Actions', align: 'center', value: 'actions', sortable: 'false' },
-      { text: 'Title', align: 'center', sortable: 'false', value: 'title' },
+      { text: 'Title', align: 'left', sortable: 'false', value: 'title' },
       { text: 'Status', align: 'center', sortable: 'false', value: 'status' },
       { text: 'User', align: 'center', sortable: 'false', value: 'user.email' },
+      { text: 'Created at', align: 'center', sortable: 'true', value: 'createdAt' }
+    ],
+    headersUser    : [
+      { text: 'Actions', align: 'center', value: 'actions', sortable: 'false' },
+      { text: 'Title', align: 'left', sortable: 'false', value: 'title' },
+      { text: 'Status', align: 'center', sortable: 'false', value: 'status' },
       { text: 'Created at', align: 'center', sortable: 'true', value: 'createdAt' }
     ],
     itemsPagination: 10,
@@ -407,6 +403,7 @@ export default {
   computed  : {
     ...mapGetters( [ 'getUser', 'getDashboard', 'getCategoriesFilter', 'getTodos', 'getTodoPagination' ] ),
     user() { return this.getUser },
+    headers() { return this.user.rol.name === 'admin' ? this.headersAdmin : this.headersUser },
     dashboard() { return this.getDashboard },
     categoriesFilter() { return this.getCategoriesFilter },
     todos() { return this.getTodos },
@@ -417,7 +414,7 @@ export default {
     minEnd() { return this.start ? this.start : '2020-11-01' }
   },
   methods   : {
-    ...mapMutations( [ 'setAlert', 'setTodo' ] ),
+    ...mapMutations( [ 'setConfirmAlert', 'setErrorAlert', 'setAlertOff', 'setTodo' ] ),
     ...mapActions( [ 'getTodoDashboard', 'findCategoriesByUser', 'getTodosByFilters', 'getTodoById', 'updateTodosStatus', 'deleteTodos' ] ),
     async dash() {
       await this.getTodoDashboard( this.user._id )
@@ -444,12 +441,7 @@ export default {
       await this.findCategoriesByUser( query )
           .then( res => {
             if ( res.status === 400 ) {
-              this.setAlert( true )
-              this.colorAlert = 'red'
-              this.statusAlert = res.body.status
-              this.messageAlert = res.body.message
-              this.errorsAlert = res.body.response && res.body.response.err || null
-              this.infoAlert = res.body.response && res.body.response.info || null
+              this.setErrorAlert( res.body )
             }
           } )
     },
@@ -480,23 +472,8 @@ export default {
       this.closeTodoDialog()
       this.filterTodos()
       this.dash()
-      this.setAlert( true )
-      this.colorAlert = 'green'
-      this.iconAlert = 'mdi-check'
-      this.statusAlert = payload.status
-      this.messageAlert = payload.message
-      this.errorsAlert = null
-      this.infoAlert = null
-      setTimeout( () => this.setAlert( false ), 4000 )
-    },
-    showErrorAlert( payload ) {
-      this.setAlert( true )
-      this.colorAlert = 'red'
-      this.iconAlert = 'mdi-alert'
-      this.statusAlert = payload.status
-      this.messageAlert = payload.message
-      this.errorsAlert = payload.response && payload.response.err || null
-      this.infoAlert = payload.response && payload.response.info || null
+      this.setConfirmAlert( payload )
+      setTimeout( () => this.setAlertOff(), 4000 )
     },
     openTodoDialogCreate() {
       this.todoCreate = true
@@ -534,7 +511,7 @@ export default {
             if ( res.status === 200 ) {
               this.showConfirmAlert( res.body )
             } else if ( res.status === 400 ) {
-              this.showErrorAlert( res.body )
+              this.setErrorAlert( res.body )
             }
           } )
     },
@@ -547,7 +524,7 @@ export default {
             if ( res.status === 200 ) {
               this.showConfirmAlert( res.body )
             } else if ( res.status === 400 ) {
-              this.showErrorAlert( res.body )
+              this.setErrorAlert( res.body )
             }
           } )
     }
