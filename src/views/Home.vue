@@ -318,14 +318,15 @@
     </v-flex>
     <v-flex md6 xs12>
       <v-bottom-sheet
-          v-model="showCategories"
+          v-model="showProfile"
           inset
           persistent
       >
-        <categories @closeCategoriesSheet="showCategories = false"/>
+        <profile @closeProfileSheet="closeProfileSheet"/>
       </v-bottom-sheet>
     </v-flex>
-    <floating-button-menu class="hidden-sm-and-down" @showCategoriesSheet="showCategories = true"/>
+    <floating-button-menu class="hidden-sm-and-down" @showCategoriesSheet="showCategories = true"
+                          @showProfileSheet="showProfile = true"/>
     <v-dialog
         v-model="todoDialog"
         hide-overlay
@@ -334,6 +335,14 @@
     >
       <todo-create-update :create="todoCreate" :show="todoShow" @closeTodoDialog="closeTodoDialog"
                           @showConfirmAlert="showConfirmAlert($event)" @showErrorAlert="showErrorAlert($event)"/>
+    </v-dialog>
+    <v-dialog
+        v-model="showCategories"
+        fullscreen
+        hide-overlay
+        transition="dialog-bottom-transition"
+    >
+      <categories @closeCategoriesSheet="showCategories = false"/>
     </v-dialog>
     <loader v-if="loader"/>
   </v-layout>
@@ -345,6 +354,7 @@ import Categories                               from '@/views/Categories'
 import DashBoardCard                            from '@/components/DashBoardCard'
 import FloatingButtonMenu                       from '@/components/FloatingButtonMenu'
 import Loader                                   from '@/components/Loader'
+import Profile                                  from '@/components/Profile'
 import TodoCard                                 from '@/components/TodoCard'
 import TodoCreateUpdate                         from '@/components/TodoCreateUpdate'
 
@@ -355,6 +365,7 @@ export default {
     DashBoardCard,
     FloatingButtonMenu,
     Loader,
+    Profile,
     TodoCard,
     TodoCreateUpdate
   },
@@ -393,7 +404,8 @@ export default {
     cardViews      : false,
     todoDialog     : false,
     todoCreate     : false,
-    todoShow       : false
+    todoShow       : false,
+    showProfile    : false
   }),
   created() {
     this.filterCategories()
@@ -527,6 +539,9 @@ export default {
               this.setErrorAlert( res.body )
             }
           } )
+    },
+    closeProfileSheet() {
+      this.showProfile = false
     }
   }
 }

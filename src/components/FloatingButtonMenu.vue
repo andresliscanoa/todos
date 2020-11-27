@@ -30,6 +30,7 @@
             dark
             fab
             small
+            @click.native="$emit('showProfileSheet')"
         >
           <v-icon>mdi-account</v-icon>
         </v-btn>

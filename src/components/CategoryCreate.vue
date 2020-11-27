@@ -14,6 +14,7 @@
         <v-flex sm6 xs12>
           <v-text-field
               v-model="name"
+              autofocus
               :error-messages="errorsName"
               color="purple"
               label="Category name"
@@ -30,6 +31,7 @@
           large
           text
           @click.native="create"
+          :disabled="this.$v.invalid"
       >
         Create
       </v-btn>
@@ -81,18 +83,20 @@ export default {
     ...mapMutations( [ 'setConfirmAlert', 'setErrorAlert', 'setAlertOff' ] ),
     ...mapActions( [ 'createCategories', 'categoryUniqueName' ] ),
     async create() {
-      this.loading = true
-      await this.createCategories( { name: this.name } )
-          .then( res => {
-            this.loading = false
-            if ( res.status === 200 ) {
-              this.$emit( 'closeCreateCategory' )
-              this.setConfirmAlert( res.body )
-              setTimeout( () => this.setAlertOff(), 4000 )
-            } else if ( res.status === 400 ) {
-              this.setErrorAlert( res.payload )
-            }
-          } )
+      if ( !this.$v.invalid ) {
+        this.loading = true
+        await this.createCategories( { name: this.name } )
+            .then( res => {
+              this.loading = false
+              if ( res.status === 200 ) {
+                this.setConfirmAlert( res.body )
+                this.closeCreateCategory()
+                setTimeout( () => this.setAlertOff(), 4000 )
+              } else if ( res.status === 400 ) {
+                this.setErrorAlert( res.payload )
+              }
+            } )
+      }
     },
     closeCreateCategory() {
       this.name = ''
