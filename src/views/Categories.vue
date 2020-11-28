@@ -1,7 +1,8 @@
 <template>
-  <v-sheet>
+  <v-sheet
+      height="100%">
     <v-card color="transparent" flat>
-      <v-app-bar color="blue lighten-2" dark flat>
+      <v-app-bar color="amber lighten-1" dark flat>
         <v-toolbar-title>
           <span class="text-subtitle-1 px-5">CATEGORIES</span>
           <v-btn icon @click.native="createCategory = true">
@@ -87,7 +88,7 @@
                       :items="itemsPerPage"
                       color="purple"
                       label="Items per page"
-                      @change="getAllCategories"
+                      @change="getAllCategories(true)"
                   />
                 </v-flex>
               </v-layout>
@@ -101,7 +102,7 @@
                   next-icon="mdi-menu-right"
                   prev-icon="mdi-menu-left"
                   total-visible="7"
-                  @input="getAllCategories"
+                  @input="getAllCategories(false)"
               />
             </div>
           </v-layout>
@@ -166,11 +167,11 @@ export default {
             }
           } )
     },
-    async getAllCategories() {
+    async getAllCategories( items ) {
       this.loading = true
       const query = {
         items: this.itemsPagination,
-        page : this.page
+        page : items ? 1 : this.page
       }
       await this.findCategoriesByUser( query )
           .then( () => {

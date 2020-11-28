@@ -3,13 +3,7 @@
     <v-toolbar color="blue lighten-2" dark flat tile>
       <v-toolbar-title>
         <span class="text-h4">
-          PROFILE
-          <v-btn v-if="!editUser" icon @click.native="editUser = true">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-          <v-btn v-if="editUser" icon @click.native="editUser = false">
-            <v-icon>mdi-cancel</v-icon>
-          </v-btn>
+          Profile
         </span>
       </v-toolbar-title>
       <v-spacer/>
@@ -22,102 +16,48 @@
       </v-btn>
     </v-toolbar>
     <v-card-text>
-      <v-layout v-if="!editUser" justify-space-around row wrap>
-        <v-flex lg3 md4 pt-2 sm6 xs12>
-          <span class="text-h5">Name: </span>
-          <span class="text-h5">{{ userFulName }}</span>
+      <v-layout justify-center row wrap>
+        <v-flex md6 px-5 xs12>
+          <v-list
+              two-line
+          >
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Name</v-list-item-title>
+                <v-list-item-subtitle>{{ userFulName }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Lastname</v-list-item-title>
+                <v-list-item-subtitle>{{ userFulLastName }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Email</v-list-item-title>
+                <v-list-item-subtitle>{{ user.email }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
         </v-flex>
-        <v-flex lg3 md4 pt-2 sm6 xs12>
-          <span class="text-h5">Lastname: </span>
-          <span class="text-h5">{{ userFulLastName }}</span>
-        </v-flex>
-        <v-flex lg4 md4 pt-2 sm6 xs12>
-          <span class="text-h5">Email: </span>
-          <span class="text-h5">{{ user.email }}</span>
-        </v-flex>
-      </v-layout>
-      <v-layout v-else justify-start row wrap>
-        <v-flex md5 px-10 sm6 xs12>
-          <v-text-field
-              v-model="user.name.first"
-              label="First name"
-          />
-        </v-flex>
-        <v-flex md5 px-10 sm6 xs12>
-          <v-text-field
-              v-model="user.name.last"
-              label="Second name"
-          />
-        </v-flex>
-        <v-flex md5 px-10 sm6 xs12>
-          <v-text-field
-              v-model="user.lastname.first"
-              label="Lastname"
-          />
-        </v-flex>
-        <v-flex md5 px-10 sm6 xs12>
-          <v-text-field
-              v-model="user.lastname.last"
-              label="Second lastname"
-          />
-        </v-flex>
-        <v-flex md5 px-10 sm6 xs12>
-          <v-text-field
-              v-model="user.email"
-              :error-messages="userEmailErrors"
-              label="Email"
-              @blur="$v.this.user.email.$touch()"
-          />
+        <v-flex md6 pt-5 px-10 xs12>
+          <v-avatar
+              class="profile"
+              size="180"
+          >
+            <v-icon color="black" size="270">mdi-account</v-icon>
+          </v-avatar>
         </v-flex>
       </v-layout>
     </v-card-text>
-    <v-card-actions v-if="editUser">
-      <v-spacer/>
-      <v-btn color="teal darken-2" text>SAVE</v-btn>
-    </v-card-actions>
   </v-card>
 </template>
 <script>
-import { required, minLength, maxLength, email } from 'vuelidate/lib/validators'
 import { mapGetters }                            from 'vuex'
 
 export default {
   name       : 'Profile',
-  data       : () => ({
-    editUser: false
-  }),
-  validations: {
-    user: {
-      name    : {
-        first: {
-          required,
-          minLength: minLength( 1 ),
-          maxLength: maxLength( 50 )
-        },
-        last : {
-          minLength: minLength( 1 ),
-          maxLength: maxLength( 50 )
-        }
-      },
-      lastname: {
-        first: {
-          required,
-          minLength: minLength( 1 ),
-          maxLength: maxLength( 50 )
-        },
-        last : {
-          minLength: minLength( 1 ),
-          maxLength: maxLength( 50 )
-        }
-      },
-      email   : {
-        required,
-        minLength: minLength( 7 ),
-        maxLength: maxLength( 255 ),
-        email
-      }
-    }
-  },
   computed   : {
     ...mapGetters( [ 'getUser' ] ),
     user() {
@@ -128,29 +68,11 @@ export default {
     },
     userFulLastName() {
       return this.getUser.lastname.last !== undefined ? this.getUser.lastname.first + ' ' + this.getUser.lastname.last : this.getUser.lastname.first
-    },
-    userEmailErrors() {
-      let err = []
-      if ( !this.$v.user.email.$dirty ) return err
-      if ( !this.$v.user.email.required ) {
-        err.push( 'Mandatory field' )
-      }
-      if ( !this.$v.user.email.minLength ) {
-        err.push( 'Minimum seven characters long' )
-      }
-      if ( !this.$v.user.email.maxLength ) {
-        err.push( 'Maximum seven characters long' )
-      }
-      if ( !this.$v.user.email.email ) {
-        err.push( 'Not a valid email format' )
-      }
-      return err
     }
   },
   methods    : {
     closeProfileSheet() {
       this.$emit( 'closeProfileSheet' )
-      this.editUser = false
     }
   }
 }

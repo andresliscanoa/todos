@@ -299,7 +299,7 @@
               :items="itemsPerPage"
               color="purple"
               label="Items per page"
-              @change="filterTodos"
+              @change="filterTodos(true)"
           />
         </v-flex>
       </v-layout>
@@ -312,19 +312,17 @@
             next-icon="mdi-menu-right"
             prev-icon="mdi-menu-left"
             total-visible="7"
-            @input="filterTodos"
+            @input="filterTodos(false)"
         />
       </div>
     </v-flex>
-    <v-flex md6 xs12>
-      <v-bottom-sheet
-          v-model="showProfile"
-          inset
-          persistent
-      >
-        <profile @closeProfileSheet="closeProfileSheet"/>
-      </v-bottom-sheet>
-    </v-flex>
+    <v-dialog
+        v-model="showProfile"
+        hide-overlay
+        width="35rem"
+    >
+      <profile @closeProfileSheet="closeProfileSheet"/>
+    </v-dialog>
     <floating-button-menu class="hidden-sm-and-down" @showCategoriesSheet="showCategories = true"
                           @showProfileSheet="showProfile = true"/>
     <v-dialog
@@ -409,7 +407,7 @@ export default {
   }),
   created() {
     this.filterCategories()
-    this.filterTodos()
+    this.filterTodos( true )
     this.dash()
   },
   computed  : {
@@ -431,11 +429,11 @@ export default {
     async dash() {
       await this.getTodoDashboard( this.user._id )
     },
-    async filterTodos() {
+    async filterTodos( value ) {
       this.loading = true
       const query = {
         items   : this.itemsPagination || 10,
-        page    : this.page || 1,
+        page    : value ? 1 : this.page,
         category: this.category._id || null,
         status  : this.status || null,
         user    : this.user.rol.name === 'admin' ? null : this.user._id,
@@ -447,7 +445,7 @@ export default {
     },
     async filterCategories() {
       const query = {
-        items: 100,
+        items: 10,
         page : 1
       }
       await this.findCategoriesByUser( query )

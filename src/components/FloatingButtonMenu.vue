@@ -60,6 +60,7 @@
             dark
             fab
             small
+            @click.native="$router.push('/admin')"
         >
           <v-icon>mdi-account-hard-hat</v-icon>
         </v-btn>

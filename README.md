@@ -30,11 +30,11 @@ Components
         - [ ] Update
         - [x] Delete
 - Categories
-    - [ ] Read
+    - [x] Read
     - Actions
-        - [ ] Create
-        - [ ] Update
-    - [ ] Pagination
+        - [x] Create
+        - [x] Update
+    - [x] Pagination
 - Users
     - [ ] Read
     - Actions
@@ -43,9 +43,7 @@ Components
     - [ ] Pagination
     - [ ] Roles
 - Profile
-    - [ ] Information page
-    - Actions
-        - [ ] Update
+    - [x] Information modal
 
 ### Project setup
 ```

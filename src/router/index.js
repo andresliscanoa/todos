@@ -13,6 +13,14 @@ const isAuth = ( to, from, next ) => {
     store.commit( 'removeAuth' )
   }
 }
+const isAdmin = ( to, from, next ) => {
+  Vue.http.headers.common['Authorization'] = localStorage.getItem( 'token' )
+  if ( store.getters.isAuth && localStorage.getItem( 'user' ) && store.getters.getUser.rol.name === 'admin' ) {
+    return next()
+  } else {
+    next( '/403' )
+  }
+}
 
 const routes = [
   {
@@ -24,8 +32,13 @@ const routes = [
     path       : '/',
     name       : 'Home',
     component  : () => import(/*webpackChunkName: "Home"*/'../views/Home'),
-    beforeEnter: isAuth,
-    children   : []
+    beforeEnter: isAuth
+  },
+  {
+    path       : '/admin',
+    name       : 'Admin',
+    component  : () => import(/*webpackChunkName: "Admin"*/'../views/Admin'),
+    beforeEnter: isAdmin
   }
 ]
 
