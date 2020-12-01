@@ -5,7 +5,7 @@
         <v-toolbar flat>
           <v-toolbar-title>Users</v-toolbar-title>
           <v-spacer/>
-          <v-btn fab large>
+          <v-btn fab large @click.native="showCreateUser = true">
             <v-icon>mdi-plus</v-icon>
           </v-btn>
         </v-toolbar>
@@ -24,27 +24,17 @@
             <template v-slot:item.actions="{ item }">
               <v-layout class="px-5" justify-space-around row>
                 <v-flex md2 pt-3 sm4 xs1>
-                  <v-tooltip color="purple lighten-3" left>
+                  <v-tooltip bottom color="purple lighten-3">
                     <template v-slot:activator="{ on }">
-                      <v-btn v-on="on" color="blue" icon @click.native="updateRol(item._id)">
-                        <v-icon>mdi-eye</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Update rol</span>
-                  </v-tooltip>
-                </v-flex>
-                <v-flex md2 pt-3 sm4 xs1>
-                  <v-tooltip color="purple lighten-3" left>
-                    <template v-slot:activator="{ on }">
-                      <v-btn v-on="on" color="blue" icon>
-                        <v-icon>mdi-eye</v-icon>
+                      <v-btn v-on="on" color="red darken-4" icon @click.native="updatePwd(item)">
+                        <v-icon>mdi-lock</v-icon>
                       </v-btn>
                     </template>
                     <span>Update password</span>
                   </v-tooltip>
                 </v-flex>
                 <v-flex md2 pt-3 sm4 xs1>
-                  <v-tooltip color="purple lighten-3" left>
+                  <v-tooltip bottom color="purple lighten-3">
                     <template v-slot:activator="{ on }">
                       <v-btn v-on="on" color="blue" icon>
                         <v-icon>mdi-eye</v-icon>
@@ -54,6 +44,36 @@
                   </v-tooltip>
                 </v-flex>
               </v-layout>
+            </template>
+            <template v-slot:item.rol.name="items">
+              <v-edit-dialog
+                  :return-value.sync="items.item.rol"
+                  @save="save(items.item)"
+              >
+                {{ items.item.rol.name }}
+                <template v-slot:input>
+                  <v-select
+                      v-model="items.item.rol"
+                      :items="roles"
+                      color="purple"
+                      item-text="name"
+                      item-value="_id"
+                      label="Rol"
+                      return-object
+                  >
+                    <template
+                        slot="selection"
+                        slot-scope="data">
+                      {{ data.item.name }}
+                    </template>
+                    <template
+                        slot="item"
+                        slot-scope="data">
+                      {{ data.item.name }}
+                    </template>
+                  </v-select>
+                </template>
+              </v-edit-dialog>
             </template>
             <template slot="no-data">
               <v-alert
@@ -69,44 +89,115 @@
         </v-card-text>
       </v-card>
     </v-flex>
+    <v-layout justify-end row wrap>
+      <v-flex lg2 mt-3 sm2 xs4>
+        <span class="text-caption">TOTAL ITEMS: {{ pagination.total }}</span>
+      </v-flex>
+      <v-flex lg1 mx-5 sm2 xs4>
+        <v-select
+            v-model="itemsPagination"
+            :items="itemsPerPage"
+            color="purple"
+            label="Items per page"
+            @change="getAllUsers(true)"
+        />
+      </v-flex>
+      <v-flex pt-2 px-5 xs12>
+        <v-pagination
+            v-model="page"
+            :length="this.pagination.pages"
+            circle
+            color="purple darken-3"
+            next-icon="mdi-menu-right"
+            prev-icon="mdi-menu-left"
+            total-visible="7"
+            @input="getAllUsers(false)"
+        />
+      </v-flex>
+    </v-layout>
+    <v-dialog
+        v-model="showCreateUser"
+        hide-overlay
+        persistent
+        width="40rem"
+    >
+      <create-users @closeCreateUser="closeCreateUser($event)"/>
+    </v-dialog>
   </v-layout>
 </template>
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
+import CreateUsers                              from '@/components/CreateUsers'
 
 export default {
-  name    : 'Admin',
-  data    : () => ({
+  name      : 'Admin',
+  components: { CreateUsers },
+  comments  : {
+    CreateUsers
+  },
+  data      : () => ({
     headers        : [
       { text: 'Actions', align: 'center', value: 'actions', sortable: 'false' },
       { text: 'Name', align: 'left', sortable: 'false', value: 'fulName' },
-      { text: 'Lastname', align: 'center', sortable: 'false', value: 'FulLastname' },
+      { text: 'Lastname', align: 'center', sortable: 'false', value: 'fulLastname' },
       { text: 'Email', align: 'center', sortable: 'false', value: 'email' },
       { text: 'Rol', align: 'center', sortable: 'true', value: 'rol.name' }
     ],
     itemsPagination: 10,
     itemsPerPage   : [ 10, 25, 50, 100 ],
     page           : 1,
-    loading        : false
+    loading        : false,
+    showCreateUser : false
   }),
   created() {
-    this.getAllUsers()
+    this.getAllUsers( false )
+    this.getAllRoles()
   },
-  computed: {
-    ...mapGetters( [ 'getUsers' ] ),
-    users() { return this.getUsers }
+  computed  : {
+    ...mapGetters( [ 'getUsers', 'getPagination', 'getRoles' ] ),
+    users() { return this.getUsers },
+    pagination() { return this.getPagination },
+    roles() { return this.getRoles }
   },
-  methods : {
-    ...mapActions( [ 'findUsers' ] ),
-    async getAllUsers() {
+  methods   : {
+    ...mapMutations( [ 'setConfirmAlert', 'setErrorAlert', 'setAlertOff' ] ),
+    ...mapActions( [ 'findUsers', 'findRoles', 'updateUserRol' ] ),
+    async getAllUsers( payload ) {
       const query = {
         items: this.itemsPagination,
-        page : this.page || 1
+        page : payload ? 1 : this.page
       }
       await this.findUsers( query )
     },
-    updateRol( item ) {
+    async getAllRoles() {
+      await this.findRoles()
+    },
+    async save( item ) {
+      const payload = {
+        id : item._id,
+        rol: item.rol._id
+      }
+      await this.updateUserRol( payload )
+          .then( res => {
+            if ( res.status === 200 ) {
+              this.setConfirmAlert( res.body )
+              setTimeout( () => this.setAlertOff(), 4000 )
+            } else if ( res.status === 400 ) {
+              this.setErrorAlert( res.body )
+            }
+            this.getAllUsers( false )
+          } )
+    },
+    updatePwd( item ) {
       console.log( item )
+    },
+    closeCreateUser( payload ) {
+      this.showCreateUser = false
+      this.getAllUsers( false )
+      if ( payload.status ) {
+        this.setConfirmAlert( payload )
+        setTimeout( () => this.setAlertOff(), 4000 )
+      }
     }
   }
 }

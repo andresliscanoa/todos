@@ -36,12 +36,12 @@ Components
         - [x] Update
     - [x] Pagination
 - Users
-    - [ ] Read
+    - [x] Read
     - Actions
-        - [ ] Create
+        - [x] Create
         - [ ] Update
-    - [ ] Pagination
-    - [ ] Roles
+    - [x] Pagination
+    - [x] Roles
 - Profile
     - [x] Information modal
 

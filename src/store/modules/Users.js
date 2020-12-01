@@ -93,7 +93,7 @@ const actions = {
             } )
     },
     async createUser( _, user ) {
-        return await Vue.http.post( 'user', user )
+        return await Vue.http.post( 'users', user )
             .then( res => {
                 return res
             } )

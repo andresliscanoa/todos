@@ -2,6 +2,7 @@ import Vue  from 'vue'
 import Vuex from 'vuex'
 
 import Categories from '@/store/modules/Categories'
+import Roles      from '@/store/modules/Roles'
 import Todos      from '@/store/modules/Todos'
 import Users      from '@/store/modules/Users'
 
@@ -29,8 +30,8 @@ export default new Vuex.Store( {
             state.alert.icon = 'mdi-alert'
             state.alert.status = payload.status
             state.alert.message = payload.message
-            state.alert.errors = payload.errors
-            state.alert.info = payload.info
+            state.alert.errors = payload.response.err || null
+            state.alert.info = payload.response.info || null
         },
         setConfirmAlert( state, payload ) {
             state.alert.alert = true
@@ -54,6 +55,7 @@ export default new Vuex.Store( {
     actions  : {},
     modules  : {
         Categories,
+        Roles,
         Todos,
         Users
     }
