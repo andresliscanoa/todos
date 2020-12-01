@@ -27,7 +27,7 @@ Components
     - [x] Pagination
     - Actions
         - [x] Create
-        - [ ] Update
+        - [x] Update
         - [x] Delete
 - Categories
     - [x] Read

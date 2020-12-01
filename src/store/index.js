@@ -30,8 +30,8 @@ export default new Vuex.Store( {
             state.alert.icon = 'mdi-alert'
             state.alert.status = payload.status
             state.alert.message = payload.message
-            state.alert.errors = payload.response.err || null
-            state.alert.info = payload.response.info || null
+            state.alert.errors = payload.response !== undefined ? payload.response.err : null
+            state.alert.info = payload.response !== undefined ? payload.response.info : null
         },
         setConfirmAlert( state, payload ) {
             state.alert.alert = true

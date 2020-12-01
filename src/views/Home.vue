@@ -317,15 +317,6 @@
       </div>
     </v-flex>
     <v-dialog
-        v-model="showProfile"
-        hide-overlay
-        width="35rem"
-    >
-      <profile @closeProfileSheet="closeProfileSheet"/>
-    </v-dialog>
-    <floating-button-menu class="hidden-sm-and-down" @showCategoriesSheet="showCategories = true"
-                          @showProfileSheet="showProfile = true"/>
-    <v-dialog
         v-model="todoDialog"
         hide-overlay
         max-width="40rem"
@@ -334,42 +325,24 @@
       <todo-create-update :create="todoCreate" :show="todoShow" @closeTodoDialog="closeTodoDialog"
                           @showConfirmAlert="showConfirmAlert($event)" @showErrorAlert="showErrorAlert($event)"/>
     </v-dialog>
-    <v-dialog
-        v-model="showCategories"
-        fullscreen
-        hide-overlay
-        transition="dialog-bottom-transition"
-    >
-      <categories @closeCategoriesSheet="showCategories = false"/>
-    </v-dialog>
-    <loader v-if="loader"/>
   </v-layout>
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import Categories                               from '@/views/Categories'
 import DashBoardCard                            from '@/components/DashBoardCard'
-import FloatingButtonMenu                       from '@/components/FloatingButtonMenu'
-import Loader                                   from '@/components/Loader'
-import Profile                                  from '@/components/Profile'
 import TodoCard                                 from '@/components/TodoCard'
 import TodoCreateUpdate                         from '@/components/TodoCreateUpdate'
 
 export default {
   name      : 'Home',
   components: {
-    Categories,
     DashBoardCard,
-    FloatingButtonMenu,
-    Loader,
-    Profile,
     TodoCard,
     TodoCreateUpdate
   },
   data      : () => ({
     showDash       : true,
-    showCategories : false,
     todoCheck      : false,
     category       : {},
     status         : '',
@@ -397,13 +370,11 @@ export default {
     loading        : false,
     deleteLoading  : false,
     updateLoading  : false,
-    loader         : false,
     listViews      : true,
     cardViews      : false,
     todoDialog     : false,
     todoCreate     : false,
-    todoShow       : false,
-    showProfile    : false
+    todoShow: false
   }),
   created() {
     this.filterCategories()
@@ -537,9 +508,6 @@ export default {
               this.setErrorAlert( res.body )
             }
           } )
-    },
-    closeProfileSheet() {
-      this.showProfile = false
     }
   }
 }

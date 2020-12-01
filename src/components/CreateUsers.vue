@@ -86,11 +86,12 @@
   </v-card>
 </template>
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapGetters, mapMutations, mapActions }  from 'vuex'
+import { required, minLength, maxLength, email } from 'vuelidate/lib/validators'
 
 export default {
-  name    : 'CreateUser',
-  data    : () => ({
+  name       : 'CreateUser',
+  data       : () => ({
     user: {
       name    : {
         first: '',
@@ -108,11 +109,60 @@ export default {
       }
     }
   }),
-  computed: {
-    ...mapGetters( [ 'getRoles' ] ),
-    roles() { return this.getRoles }
+  validations: {
+    user: {
+      name    : {
+        first: {
+          required,
+          minLength: minLength( 2 ),
+          maxLength: maxLength( 255 )
+        },
+        last : {
+          maxLength: maxLength( 255 )
+        }
+      },
+      lastname: {
+        first: {
+          required,
+          minLength: minLength( 2 ),
+          maxLength: maxLength( 255 )
+        },
+        last : {
+          maxLength: maxLength( 255 )
+        }
+      },
+      email   : {
+        required,
+        minLength: minLength( 7 ),
+        maxLength: maxLength( 150 ),
+        email
+      },
+      rol     : {
+        name: {
+          required,
+          mustBe( value ) {
+            return [ 'admin', 'users' ].indexOf( value ) >= 0
+          }
+        }
+      }
+    }
   },
-  methods : {
+  computed   : {
+    ...mapGetters( [ 'getRoles' ] ),
+    roles() { return this.getRoles },
+    rolErrors() {
+      let err = []
+      if ( !this.$v.user.rol.$dirty ) return err
+      if ( !this.$v.user.rol.name.required ) {
+        err.push( 'Mandatory field' )
+      }
+      if ( !this.$v.user.rol.name.mustBe ) {
+        err.push( 'Invalid value' )
+      }
+      return err
+    }
+  },
+  methods    : {
     ...mapMutations( [ 'setErrorAlert' ] ),
     ...mapActions( [ 'createUser' ] ),
     async createUsers( payload ) {

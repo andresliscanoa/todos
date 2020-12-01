@@ -20,6 +20,8 @@
         <transition>
           <router-view></router-view>
         </transition>
+        <floating-button-menu v-if="user._id" class="hidden-sm-and-down"
+                              @showCategoriesSheet="showCategories = true" @showProfileSheet="showProfile = true"/>
       </v-container>
     </v-main>
     <v-footer absolute app>
@@ -27,18 +29,56 @@
       <span class="text-button"><strong>&copy;{{ year }}</strong></span>
     </v-footer>
     <alert/>
+    <v-dialog
+        v-model="showProfile"
+        hide-overlay
+        width="35rem"
+    >
+      <profile @closeProfileSheet="closeProfileSheet"/>
+    </v-dialog>
+    <v-dialog
+        v-model="showCategories"
+        fullscreen
+        hide-overlay
+        transition="dialog-bottom-transition"
+    >
+      <categories @closeCategoriesSheet="showCategories = false"/>
+    </v-dialog>
+    <loader v-if="loader"/>
   </v-app>
 </template>
 
 <script>
-import Alert from '@/components/Alert'
+import { mapGetters }     from 'vuex'
+import Categories         from '@/views/Categories'
+import FloatingButtonMenu from '@/components/FloatingButtonMenu'
+import Loader             from '@/components/Loader'
+import Profile            from '@/components/Profile'
+import Alert              from '@/components/Alert'
+
 export default {
   name      : 'App',
   components: {
-    Alert
+    Alert,
+    Categories,
+    FloatingButtonMenu,
+    Loader,
+    Profile
   },
+  data      : () => ({
+    loader        : false,
+    showCategories: false,
+    showProfile   : false
+  }),
   computed  : {
+    ...mapGetters( [ 'getUser' ] ),
+    user() { return this.getUser },
     year() { return new Date().getFullYear() }
+  },
+  methods   : {
+    closeProfileSheet() {
+      this.showProfile = false
+    }
   }
 }
 </script>

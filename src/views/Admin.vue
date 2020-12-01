@@ -26,7 +26,7 @@
                 <v-flex md2 pt-3 sm4 xs1>
                   <v-tooltip bottom color="purple lighten-3">
                     <template v-slot:activator="{ on }">
-                      <v-btn v-on="on" color="red darken-4" icon @click.native="updatePwd(item)">
+                      <v-btn v-on="on" color="red darken-4" icon @click.native="updatePwd(item._id)">
                         <v-icon>mdi-lock</v-icon>
                       </v-btn>
                     </template>
@@ -36,7 +36,7 @@
                 <v-flex md2 pt-3 sm4 xs1>
                   <v-tooltip bottom color="purple lighten-3">
                     <template v-slot:activator="{ on }">
-                      <v-btn v-on="on" color="blue" icon>
+                      <v-btn v-on="on" :loading="loadingUser" color="blue" icon @click.native="openShowUser(item._id)">
                         <v-icon>mdi-eye</v-icon>
                       </v-btn>
                     </template>
@@ -123,31 +123,54 @@
     >
       <create-users @closeCreateUser="closeCreateUser($event)"/>
     </v-dialog>
+    <v-dialog
+        v-model="showUser"
+        hide-overlay
+        persistent
+        width="40rem"
+    >
+      <user-view-update :user="user" @closeShowUser="closeShowUser($event)"/>
+    </v-dialog>
+    <v-dialog
+        v-model="showUpdatePassword"
+        hide-overlay
+        persistent
+        width="25rem"
+    >
+      <user-password :_id="idUser" @closeUpdatePassword="closeUpdatePassword($event)"/>
+    </v-dialog>
   </v-layout>
 </template>
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import CreateUsers                              from '@/components/CreateUsers'
+import UserPassword                             from '@/components/UserPassword'
+import UserViewUpdate                           from '@/components/UserViewUpdate'
 
 export default {
   name      : 'Admin',
-  components: { CreateUsers },
+  components: { CreateUsers, UserPassword, UserViewUpdate },
   comments  : {
     CreateUsers
   },
   data      : () => ({
-    headers        : [
+    headers           : [
       { text: 'Actions', align: 'center', value: 'actions', sortable: 'false' },
       { text: 'Name', align: 'left', sortable: 'false', value: 'fulName' },
       { text: 'Lastname', align: 'center', sortable: 'false', value: 'fulLastname' },
       { text: 'Email', align: 'center', sortable: 'false', value: 'email' },
       { text: 'Rol', align: 'center', sortable: 'true', value: 'rol.name' }
     ],
-    itemsPagination: 10,
-    itemsPerPage   : [ 10, 25, 50, 100 ],
-    page           : 1,
-    loading        : false,
-    showCreateUser : false
+    itemsPagination   : 10,
+    itemsPerPage      : [ 10, 25, 50, 100 ],
+    page              : 1,
+    loading           : false,
+    loadingUser       : false,
+    showUser          : false,
+    showCreateUser    : false,
+    showUpdatePassword: false,
+    idUser            : '',
+    user              : {}
   }),
   created() {
     this.getAllUsers( false )
@@ -161,7 +184,7 @@ export default {
   },
   methods   : {
     ...mapMutations( [ 'setConfirmAlert', 'setErrorAlert', 'setAlertOff' ] ),
-    ...mapActions( [ 'findUsers', 'findRoles', 'updateUserRol' ] ),
+    ...mapActions( [ 'findUsers', 'findRoles', 'updateUserRol', 'findUserById' ] ),
     async getAllUsers( payload ) {
       const query = {
         items: this.itemsPagination,
@@ -188,8 +211,9 @@ export default {
             this.getAllUsers( false )
           } )
     },
-    updatePwd( item ) {
-      console.log( item )
+    updatePwd( payload ) {
+      this.idUser = payload
+      this.showUpdatePassword = true
     },
     closeCreateUser( payload ) {
       this.showCreateUser = false
@@ -197,6 +221,32 @@ export default {
       if ( payload.status ) {
         this.setConfirmAlert( payload )
         setTimeout( () => this.setAlertOff(), 4000 )
+      }
+    },
+    closeUpdatePassword( payload ) {
+      this.showUpdatePassword = false
+      if ( payload.status ) {
+        this.setConfirmAlert( payload )
+        setTimeout( () => this.setAlertOff(), 4000 )
+      }
+    },
+    async openShowUser( payload ) {
+      this.loadingUser = true
+      await this.findUserById( payload )
+          .then( res => {
+            if ( res.status === 200 ) {
+              this.user = res.body.response
+              this.showUser = true
+            }
+            this.loadingUser = false
+          } )
+    },
+    closeShowUser( payload ) {
+      this.showUser = false
+      if ( payload.status ) {
+        this.setConfirmAlert( payload )
+        setTimeout( () => this.setAlertOff(), 4000 )
+        this.getAllUsers( true )
       }
     }
   }
