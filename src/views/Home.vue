@@ -1,22 +1,5 @@
 <template>
   <v-layout justify-space-around row wrap>
-    <v-flex class="hidden-md-and-up" mb-3 xs12>
-      <v-layout justify-center row wrap>
-        <v-flex sm6 xs10>
-          <v-app-bar color="transparent" flat>
-            <v-toolbar-items>
-              <v-btn color="blue" text><span class="text-caption">PROFILE</span></v-btn>
-              <v-divider vertical></v-divider>
-              <v-btn color="orange" text><span class="text-caption">CATEGORIES</span></v-btn>
-              <v-divider v-if="user.rol.name === 'admin'" vertical></v-divider>
-              <v-btn v-if="user.rol.name === 'admin'" color="red" text><span class="text-caption">ADMIN</span></v-btn>
-              <v-divider vertical></v-divider>
-              <v-btn color="red darken-4" text><span class="text-caption">LOGOUT</span></v-btn>
-            </v-toolbar-items>
-          </v-app-bar>
-        </v-flex>
-      </v-layout>
-    </v-flex>
     <v-flex mx-10 xs12>
       <v-card color="purple lighten-4" flat>
         <v-app-bar color="transparent" dark flat>
@@ -153,12 +136,12 @@
                     ></v-date-picker>
                   </v-menu>
                 </v-flex>
-                <v-flex v-if="user.rol.name==='admin'" md2 px-2 xs12>
+                <v-flex v-if="user.rol.name==='admin'" md3 px-2 xs12>
                   <v-select
-                      v-model="category"
-                      :items="categoriesFilter"
+                      v-model="userF"
+                      :items="users"
                       dark
-                      item-text="name"
+                      item-text="email"
                       item-value="_id"
                       label="User"
                       return-object
@@ -166,12 +149,12 @@
                     <template
                         slot="selection"
                         slot-scope="data">
-                      {{ data.item.name }}
+                      {{ data.item.email }}
                     </template>
                     <template
                         slot="item"
                         slot-scope="data">
-                      {{ data.item.name }}
+                      {{ data.item.email }}
                     </template>
                   </v-select>
                 </v-flex>
@@ -345,6 +328,7 @@ export default {
     showDash       : true,
     todoCheck      : false,
     category       : {},
+    userF          : {},
     status         : '',
     start          : '',
     menuStart      : false,
@@ -380,10 +364,12 @@ export default {
     this.filterCategories()
     this.filterTodos( true )
     this.dash()
+    this.usersFilter()
   },
   computed  : {
-    ...mapGetters( [ 'getUser', 'getDashboard', 'getCategoriesFilter', 'getTodos', 'getTodoPagination' ] ),
+    ...mapGetters( [ 'getUser', 'getDashboard', 'getCategoriesFilter', 'getTodos', 'getTodoPagination', 'getUsers' ] ),
     user() { return this.getUser },
+    users() { return this.getUsers },
     headers() { return this.user.rol.name === 'admin' ? this.headersAdmin : this.headersUser },
     dashboard() { return this.getDashboard },
     categoriesFilter() { return this.getCategoriesFilter },
@@ -396,9 +382,16 @@ export default {
   },
   methods   : {
     ...mapMutations( [ 'setConfirmAlert', 'setErrorAlert', 'setAlertOff', 'setTodo' ] ),
-    ...mapActions( [ 'getTodoDashboard', 'findCategoriesByUser', 'getTodosByFilters', 'getTodoById', 'updateTodosStatus', 'deleteTodos' ] ),
+    ...mapActions( [ 'getTodoDashboard', 'findCategoriesByUser', 'getTodosByFilters', 'getTodoById', 'updateTodosStatus', 'deleteTodos', 'findUsers' ] ),
     async dash() {
       await this.getTodoDashboard( this.user._id )
+    },
+    async usersFilter() {
+      const query = {
+        items: 100,
+        page : 1
+      }
+      await this.findUsers( query )
     },
     async filterTodos( value ) {
       this.loading = true
@@ -407,7 +400,7 @@ export default {
         page    : value ? 1 : this.page,
         category: this.category._id || null,
         status  : this.status || null,
-        user    : this.user.rol.name === 'admin' ? null : this.user._id,
+        user    : this.userF._id ? this.userF._id : this.user.rol.name === 'admin' ? null : this.user._id,
         start   : this.start || null,
         end     : this.end || null
       }

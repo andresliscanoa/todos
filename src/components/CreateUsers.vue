@@ -241,6 +241,9 @@ export default {
     passwordErrors() {
       let err = []
       if ( !this.$v.user.password.$dirty ) return err
+      if ( !this.$v.user.password.required ) {
+        err.push( 'Mandatory field' )
+      }
       if ( !this.$v.user.password.minLength ) {
         err.push( 'Minimum six characters' )
       }

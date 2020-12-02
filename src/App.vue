@@ -17,6 +17,24 @@
     </v-app-bar>
     <v-main>
       <v-container>
+        <v-flex class="hidden-md-and-up" mb-3 xs12>
+          <v-layout justify-center row wrap>
+            <v-flex sm6 xs10>
+              <v-app-bar color="transparent" flat>
+                <v-toolbar-items>
+                  <v-btn color="blue" text><span class="text-caption">PROFILE</span></v-btn>
+                  <v-divider vertical></v-divider>
+                  <v-btn color="orange" text><span class="text-caption">CATEGORIES</span></v-btn>
+                  <v-divider v-if="user.rol.name === 'admin'" vertical></v-divider>
+                  <v-btn v-if="user.rol.name === 'admin'" color="red" text><span class="text-caption">ADMIN</span>
+                  </v-btn>
+                  <v-divider vertical></v-divider>
+                  <v-btn color="red darken-4" text><span class="text-caption">LOGOUT</span></v-btn>
+                </v-toolbar-items>
+              </v-app-bar>
+            </v-flex>
+          </v-layout>
+        </v-flex>
         <transition>
           <router-view></router-view>
         </transition>
