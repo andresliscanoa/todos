@@ -55,6 +55,8 @@
               v-model="user.name.first"
               color="purple"
               label="First name"
+              :error-messages="firstNameErrors"
+              @blur="$v.user.name.first.$touch()"
           />
         </v-flex>
         <v-flex lg3 md6 px-2 xs12>
@@ -62,6 +64,8 @@
               v-model="user.name.last"
               color="purple"
               label="Second name"
+              :error-messages="lastNameErrors"
+              @blur="$v.user.name.last.$touch()"
           />
         </v-flex>
         <v-flex lg3 md6 px-2 xs12>
@@ -69,6 +73,8 @@
               v-model="user.lastname.first"
               color="purple"
               label="First lastname"
+              :error-messages="firstLastnameErrors"
+              @blur="$v.user.lastname.first.$touch()"
           />
         </v-flex>
         <v-flex lg3 md6 px-2 xs12>
@@ -76,6 +82,8 @@
               v-model="user.lastname.last"
               color="purple"
               label="Second lastname"
+              :error-messages="lastLastnameErrors"
+              @blur="$v.user.lastname.last.$touch()"
           />
         </v-flex>
         <v-flex md6 px-2 xs12>
@@ -83,6 +91,8 @@
               v-model="user.email"
               color="purple"
               label="Email"
+              :error-messages="emailErrors"
+              @blur="$v.user.email.$touch()"
           />
         </v-flex>
         <v-flex md6 px-2 xs12>
@@ -94,6 +104,8 @@
               item-value="_id"
               label="Rol"
               return-object
+              :error-messages="rolErrors"
+              @blur="$v.user.rol.$touch()"
           >
             <template
                 slot="selection"
@@ -112,11 +124,12 @@
   </v-card>
 </template>
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapGetters, mapMutations, mapActions }  from 'vuex'
+import { required, minLength, maxLength, email } from 'vuelidate/lib/validators'
 
 export default {
-  name    : 'UserViewUpdate',
-  props   : {
+  name       : 'UserViewUpdate',
+  props      : {
     user: {
       type    : Object,
       required: true,
@@ -140,20 +153,130 @@ export default {
       }
     }
   },
-  data    : () => ({
+  data       : () => ({
     updateUser: false,
     loading   : false
   }),
-  computed: {
+  validations: {
+    user: {
+      name    : {
+        first: {
+          required,
+          minLength: minLength( 2 ),
+          maxLength: maxLength( 50 )
+        },
+        last : {
+          maxLength: maxLength( 50 )
+        }
+      },
+      lastname: {
+        first: {
+          required,
+          minLength: minLength( 2 ),
+          maxLength: maxLength( 50 )
+        },
+        last : {
+          maxLength: maxLength( 50 )
+        }
+      },
+      email   : {
+        required,
+        minLength: minLength( 7 ),
+        maxLength: maxLength( 150 ),
+        email
+      },
+      rol     : {
+        name: {
+          required,
+          mustBe( value ) {
+            return [ 'admin', 'users' ].indexOf( value ) >= 0
+          }
+        }
+      }
+    }
+  },
+  computed   : {
     ...mapGetters( [ 'getRoles' ] ),
     roles() { return this.getRoles },
     fullName() {
       const name = this.user.name.last ? this.user.name.first + ' ' + this.user.name.last : this.user.name.first
       const lastname = this.user.lastname.last ? this.user.lastname.first + ' ' + this.user.lastname.last : this.user.lastname.first
       return name + ' ' + lastname
+    },
+    firstNameErrors() {
+      let err = []
+      if ( !this.$v.user.name.first.$dirty ) return err
+      if ( !this.$v.user.name.first.required ) {
+        err.push( 'Mandatory field' )
+      }
+      if ( !this.$v.user.name.first.minLength ) {
+        err.push( 'Minimum two characters' )
+      }
+      if ( !this.$v.user.name.first.maxLength ) {
+        err.push( 'Maximum 50 characters' )
+      }
+      return err
+    },
+    lastNameErrors() {
+      let err = []
+      if ( !this.$v.user.name.last.$dirty ) return err
+      if ( !this.$v.user.name.last.maxLength ) {
+        err.push( 'Maximum 50 characters' )
+      }
+      return err
+    },
+    firstLastnameErrors() {
+      let err = []
+      if ( !this.$v.user.lastname.first.$dirty ) return err
+      if ( !this.$v.user.lastname.first.required ) {
+        err.push( 'Mandatory field' )
+      }
+      if ( !this.$v.user.lastname.first.minLength ) {
+        err.push( 'Minimum two characters' )
+      }
+      if ( !this.$v.user.lastname.first.maxLength ) {
+        err.push( 'Maximum 50 characters' )
+      }
+      return err
+    },
+    lastLastnameErrors() {
+      let err = []
+      if ( !this.$v.user.lastname.last.$dirty ) return err
+      if ( !this.$v.user.lastname.last.maxLength ) {
+        err.push( 'Maximum 50 characters' )
+      }
+      return err
+    },
+    emailErrors() {
+      let err = []
+      if ( !this.$v.user.email.$dirty ) return err
+      if ( !this.$v.user.email.required ) {
+        err.push( 'Mandatory field' )
+      }
+      if ( !this.$v.user.email.minLength ) {
+        err.push( 'Minimum seven characters' )
+      }
+      if ( !this.$v.user.email.maxLength ) {
+        err.push( 'Maximum 150 characters' )
+      }
+      if ( !this.$v.user.email.email ) {
+        err.push( 'Not a valid email format' )
+      }
+      return err
+    },
+    rolErrors() {
+      let err = []
+      if ( !this.$v.user.rol.$dirty ) return err
+      if ( !this.$v.user.rol.name.required ) {
+        err.push( 'Mandatory field' )
+      }
+      if ( !this.$v.user.rol.name.mustBe ) {
+        err.push( 'Invalid value' )
+      }
+      return err
     }
   },
-  methods : {
+  methods    : {
     ...mapMutations( [ 'setErrorAlert' ] ),
     ...mapActions( [ 'updateUserById' ] ),
     async saveUpdateUser() {

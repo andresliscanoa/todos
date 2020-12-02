@@ -39,7 +39,7 @@ Components
     - [x] Read
     - Actions
         - [x] Create
-        - [ ] Update
+        - [x] Update
     - [x] Pagination
     - [x] Roles
 - Profile

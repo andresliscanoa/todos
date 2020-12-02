@@ -47,6 +47,8 @@
               v-model="todo.title"
               color="purple"
               label="Title"
+              :error-messages="titleErrors"
+              @blur="$v.todo.title.$touch"
           />
         </v-flex>
         <v-flex v-if="create||updateTodo" md7 pt-2 px-2 xs12>
@@ -54,6 +56,8 @@
               v-model="todo.description"
               color="purple"
               label="Description"
+              :error-messages="descriptionErrors"
+              @blur="$v.todo.description.$touch"
           />
         </v-flex>
         <v-flex v-if="show&&!updateTodo" pt-2 px-2 xs12>
@@ -74,6 +78,8 @@
               item-value="_id"
               label="Category"
               return-object
+              :error-messages="categoryErrors"
+              @blur="$v.todo.category.$touch"
           >
             <template
                 slot="selection"
@@ -94,6 +100,8 @@
               :items="itemStatus"
               color="purple"
               label="Status"
+              :error-messages="statusErrors"
+              @blur="$v.todo.status.$touch"
           />
         </v-flex>
         <v-flex md6 pt-2 px-2 xs12>
@@ -165,6 +173,7 @@
               large
               text
               @click.native="createTodos(todo)"
+              :disabled="$v.todo.$invalid"
           >
             <span class="text-button">CREATE</span>
           </v-btn>
@@ -182,10 +191,11 @@
 </template>
 <script>
 import { mapActions, mapGetters, mapMutations } from 'vuex'
+import { required, maxLength }                  from 'vuelidate/lib/validators'
 
 export default {
-  name    : 'TodoCreateUpdate',
-  props   : {
+  name       : 'TodoCreateUpdate',
+  props      : {
     show  : {
       type   : Boolean,
       default: false
@@ -195,7 +205,7 @@ export default {
       default: false
     }
   },
-  data    : () => ({
+  data       : () => ({
     createLoading: false,
     updateLoading: false,
     updateTodo   : false,
@@ -203,7 +213,27 @@ export default {
     menuStart    : false,
     menuDeadline : false
   }),
-  computed: {
+  validations: {
+    todo: {
+      title      : {
+        required,
+        maxLength: maxLength( 255 )
+      },
+      description: {
+        maxLength: maxLength( 255 )
+      },
+      category   : {
+        required
+      },
+      status     : {
+        required,
+        mustBe( value ) {
+          return [ 'Pending', 'Overdue', 'Finished' ].indexOf( value ) >= 0
+        }
+      }
+    }
+  },
+  computed   : {
     ...mapGetters( [ 'getCategoriesFilter', 'getUser', 'getTodo' ] ),
     categoriesFilter() { return this.getCategoriesFilter.filter( item => item.status === true ) },
     minDeadline() {
@@ -212,9 +242,48 @@ export default {
     user() {
       return this.getUser
     },
-    todo() { return this.getTodo }
+    todo() { return this.getTodo },
+    titleErrors() {
+      let err = []
+      if ( !this.$v.todo.title.$dirty ) return err
+      if ( !this.$v.todo.title.required ) {
+        err.push( 'Mandatory field' )
+      }
+      if ( !this.$v.todo.title.maxLength ) {
+        err.push( 'Maximun 255 characters' )
+      }
+      return err
+    },
+    descriptionErrors() {
+      let err = []
+      if ( !this.$v.todo.description.$dirty ) return err
+      if ( !this.$v.todo.description.maxLength ) {
+        err.push( 'Maximun 255 characters' )
+      }
+      return err
+    },
+    categoryErrors() {
+      let err = []
+      if ( !this.$v.todo.category.$dirty ) return err
+      if ( !this.$v.todo.category.required ) {
+        err.push( 'Mandatory field' )
+      }
+      return err
+    },
+    statusErrors() {
+      let err = []
+      if ( !this.$v.todo.status.$dirty ) return err
+      if ( !this.$v.todo.status.$dirty ) return err
+      if ( !this.$v.todo.status.required ) {
+        err.push( 'Mandatory field' )
+      }
+      if ( !this.$v.todo.status.mustBe ) {
+        err.push( 'Value not allowed' )
+      }
+      return err
+    }
   },
-  methods : {
+  methods    : {
     ...mapMutations( [ 'setTodo' ] ),
     ...mapActions( [ 'createTodo', 'updateTodos' ] ),
     async createTodos( payload ) {
