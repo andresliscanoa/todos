@@ -52,7 +52,19 @@ export default new Vuex.Store( {
             state.alert.info = {}
         }
     },
-    actions  : {},
+    actions  : {
+        async starting() {
+            return await Vue.http.get( 'status' )
+                .then(
+                    res => {
+                        return res
+                    }
+                )
+                .catch( err => {
+                    return err
+                } )
+        }
+    },
     modules  : {
         Categories,
         Roles,

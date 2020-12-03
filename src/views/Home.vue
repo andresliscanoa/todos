@@ -185,6 +185,17 @@
                       <span class="text-caption">CARDS VIEW</span>
                     </v-tooltip>
                   </v-flex>
+<!--                  <v-flex md1 sm2 xs5>
+                    <v-tooltip bottom color="purple lighten-3">
+                      <template v-slot:activator="{on}">
+                        <v-btn v-on="on" :color="calendarViews ? 'purple' : 'white'" dark icon outlined
+                               @click.native="cardView()">
+                          <v-icon>mdi-calendar</v-icon>
+                        </v-btn>
+                      </template>
+                      <span class="text-caption">CALENDAR VIEW</span>
+                    </v-tooltip>
+                  </v-flex>-->
                 </v-layout>
                 <v-flex lg1 md2 sm2 xs3>
                   <v-btn dark text @click.native="filterTodos()">Search</v-btn>
@@ -272,21 +283,23 @@
           />
         </v-flex>
       </v-layout>
-      <v-layout justify-end row wrap>
-        <v-flex lg2 mt-3 sm2 xs4>
-          <span class="text-caption">TOTAL ITEMS: {{ todoPagination.total }}</span>
-        </v-flex>
-        <v-flex lg1 mx-5 sm2 xs4>
-          <v-select
-              v-model="itemsPagination"
-              :items="itemsPerPage"
-              color="purple"
-              label="Items per page"
-              @change="filterTodos(true)"
-          />
-        </v-flex>
-      </v-layout>
-      <div class="text-center pt-2">
+      <v-flex xs12>
+        <v-layout justify-end row wrap>
+          <v-flex lg2 mt-3 sm2 xs4>
+            <span class="text-caption">TOTAL ITEMS: {{ todoPagination.total }}</span>
+          </v-flex>
+          <v-flex lg1 mx-5 sm2 xs4>
+            <v-select
+                v-model="itemsPagination"
+                :items="itemsPerPage"
+                color="purple"
+                label="Items per page"
+                @change="filterTodos(true)"
+            />
+          </v-flex>
+        </v-layout>
+      </v-flex>
+      <v-flex class="text-center pt-2" sx12>
         <v-pagination
             v-model="page"
             :length="this.todoPagination.pages"
@@ -297,7 +310,7 @@
             total-visible="7"
             @input="filterTodos(false)"
         />
-      </div>
+      </v-flex>
     </v-flex>
     <v-dialog
         v-model="todoDialog"
@@ -356,15 +369,20 @@ export default {
     updateLoading  : false,
     listViews      : true,
     cardViews      : false,
+    calendarViews  : false,
     todoDialog     : false,
     todoCreate     : false,
-    todoShow: false
+    todoShow       : false
   }),
-  created() {
-    this.filterCategories()
-    this.filterTodos( true )
-    this.dash()
-    this.usersFilter()
+  async created() {
+    await this.dash()
+        .then( res => {
+          if ( res.status === 200 ) {
+            this.filterTodos( true )
+            this.filterCategories()
+            this.usersFilter()
+          }
+        } )
   },
   computed  : {
     ...mapGetters( [ 'getUser', 'getDashboard', 'getCategoriesFilter', 'getTodos', 'getTodoPagination', 'getUsers' ] ),
@@ -381,7 +399,7 @@ export default {
     minEnd() { return this.start ? this.start : '2020-11-01' }
   },
   methods   : {
-    ...mapMutations( [ 'setConfirmAlert', 'setErrorAlert', 'setAlertOff', 'setTodo' ] ),
+    ...mapMutations( [ 'setConfirmAlert', 'setErrorAlert', 'setAlertOff', 'setTodo', 'starting' ] ),
     ...mapActions( [ 'getTodoDashboard', 'findCategoriesByUser', 'getTodosByFilters', 'getTodoById', 'updateTodosStatus', 'deleteTodos', 'findUsers' ] ),
     async dash() {
       await this.getTodoDashboard( this.user._id )
