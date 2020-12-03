@@ -47,7 +47,25 @@ const mutations = {
             }
         } )
     },
-    setTodo( state, payload ) { state.Todo = payload },
+    setTodo( state, payload ) {
+        state.Todo = {
+            _id        : payload._id,
+            category   : {
+                _id : payload.category._id,
+                name: payload.category._id
+            },
+            createdAt  : payload.createdAt.replace( 'T', ' ' ).substr( 0, 19 ),
+            deadline   : payload.deadline ? payload.deadline.replace( 'T', ' ' ).substr( 0, 19 ) : '',
+            description: payload.description,
+            start      : payload.start ? payload.start.replace( 'T', ' ' ).substr( 0, 19 ) : '',
+            status     : payload.status,
+            title      : payload.title,
+            user       : {
+                _id  : payload.user._id,
+                email: payload.user.email
+            }
+        }
+    },
     setDashboard( state, payload ) { state.dashboard = payload },
     setTodoPagination( state, payload ) { state.todoPagination = payload }
 }

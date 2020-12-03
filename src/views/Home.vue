@@ -225,7 +225,7 @@
               <v-flex md2 pt-3 sm4 xs1>
                 <v-tooltip color="purple lighten-3" left>
                   <template v-slot:activator="{ on }">
-                    <v-btn v-on="on" color="blue" icon @click.native="openTodoDialogShow(item._id)">
+                    <v-btn v-on="on" color="blue" icon @click.native="openTodoDialogShow(item)">
                       <v-icon>mdi-eye</v-icon>
                     </v-btn>
                   </template>
@@ -424,6 +424,7 @@ export default {
       this.end = ''
       this.category = {}
       this.status = ''
+      this.userF = {}
       const query = {
         items: this.itemsPagination || 10,
         page : this.page || 1,
@@ -461,8 +462,8 @@ export default {
     async openTodoDialogShow( payload ) {
       this.loader = true
       const find = {
-        id  : payload,
-        user: this.user._id
+        id  : payload._id,
+        user: payload.user._id
       }
       await this.getTodoById( find )
           .then( res => {
