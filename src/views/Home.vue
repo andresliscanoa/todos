@@ -185,17 +185,17 @@
                       <span class="text-caption">CARDS VIEW</span>
                     </v-tooltip>
                   </v-flex>
-<!--                  <v-flex md1 sm2 xs5>
+                  <v-flex md1 sm2 xs5>
                     <v-tooltip bottom color="purple lighten-3">
                       <template v-slot:activator="{on}">
                         <v-btn v-on="on" :color="calendarViews ? 'purple' : 'white'" dark icon outlined
-                               @click.native="cardView()">
+                               @click.native="calendarView()">
                           <v-icon>mdi-calendar</v-icon>
                         </v-btn>
                       </template>
                       <span class="text-caption">CALENDAR VIEW</span>
                     </v-tooltip>
-                  </v-flex>-->
+                  </v-flex>
                 </v-layout>
                 <v-flex lg1 md2 sm2 xs3>
                   <v-btn dark text @click.native="filterTodos()">Search</v-btn>
@@ -283,7 +283,10 @@
           />
         </v-flex>
       </v-layout>
-      <v-flex xs12>
+      <v-flex v-show="calendarViews" xs12>
+        <todo-calendar/>
+      </v-flex>
+      <v-flex v-show="!calendarViews" xs12>
         <v-layout justify-end row wrap>
           <v-flex lg2 mt-3 sm2 xs4>
             <span class="text-caption">TOTAL ITEMS: {{ todoPagination.total }}</span>
@@ -299,7 +302,7 @@
           </v-flex>
         </v-layout>
       </v-flex>
-      <v-flex class="text-center pt-2" sx12>
+      <v-flex v-show="!calendarViews" class="text-center pt-2" sx12>
         <v-pagination
             v-model="page"
             :length="this.todoPagination.pages"
@@ -327,6 +330,7 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import DashBoardCard                            from '@/components/DashBoardCard'
+import TodoCalendar                             from '@/components/TodoCalendar'
 import TodoCard                                 from '@/components/TodoCard'
 import TodoCreateUpdate                         from '@/components/TodoCreateUpdate'
 
@@ -334,6 +338,7 @@ export default {
   name      : 'Home',
   components: {
     DashBoardCard,
+    TodoCalendar,
     TodoCard,
     TodoCreateUpdate
   },
@@ -453,10 +458,17 @@ export default {
     listView() {
       this.cardViews = false
       this.listViews = true
+      this.calendarViews = false
     },
     cardView() {
       this.cardViews = true
       this.listViews = false
+      this.calendarViews = false
+    },
+    calendarView() {
+      this.cardViews = false
+      this.listViews = false
+      this.calendarViews = true
     },
     colorCard( todo ) {
       return todo.status === 'Pending' ? 'pink lighten-2' : todo.status === 'Overdue' ? 'orange' : 'teal lighten-2'
