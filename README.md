@@ -12,6 +12,8 @@ Components
 ```
 
 ### Task
+- General
+    - [x] Main loader
 - Login
     - [x] LocalStorage
     - [x] Destroy persistence (Logout)
@@ -23,6 +25,7 @@ Components
     - View Mode
         - [x] List
         - [x] Cards
+        - [ ] Calendar
     - [x] Filters
     - [x] Pagination
     - Actions
@@ -58,11 +61,6 @@ npm run serve
 ### Compiles and minifies for production
 ```
 npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
 ```
 
 ### Env vars

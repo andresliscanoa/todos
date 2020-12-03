@@ -57,13 +57,13 @@
 </template>
 
 <script>
-import { mapGetters }     from 'vuex'
-import Categories         from '@/views/Categories'
-import FloatingButtonMenu from '@/components/FloatingButtonMenu'
-import Loader             from '@/components/Loader'
-import Profile            from '@/components/Profile'
-import Alert              from '@/components/Alert'
-import MobileMenu         from '@/components/MobileMenu'
+import { mapGetters, mapActions } from 'vuex'
+import Categories                 from '@/views/Categories'
+import FloatingButtonMenu         from '@/components/FloatingButtonMenu'
+import Loader                     from '@/components/Loader'
+import Profile                    from '@/components/Profile'
+import Alert                      from '@/components/Alert'
+import MobileMenu                 from '@/components/MobileMenu'
 
 export default {
   name      : 'App',
@@ -80,12 +80,20 @@ export default {
     showCategories: false,
     showProfile   : false
   }),
+  async created() {
+    this.loader = true
+    await this.starting()
+        .then( () => {
+          this.loader = false
+        } )
+  },
   computed  : {
     ...mapGetters( [ 'getUser' ] ),
     user() { return this.getUser },
     year() { return new Date().getFullYear() }
   },
   methods   : {
+    ...mapActions( [ 'starting' ] ),
     closeProfileSheet() {
       this.showProfile = false
     }
