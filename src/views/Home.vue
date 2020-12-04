@@ -379,15 +379,11 @@ export default {
     todoCreate     : false,
     todoShow       : false
   }),
-  async created() {
-    await this.dash()
-        .then( res => {
-          if ( res.status === 200 ) {
-            this.filterTodos( true )
-            this.filterCategories()
-            this.usersFilter()
-          }
-        } )
+  created() {
+    this.dash()
+    this.filterTodos( true )
+    this.filterCategories()
+    this.usersFilter()
   },
   computed  : {
     ...mapGetters( [ 'getUser', 'getDashboard', 'getCategoriesFilter', 'getTodos', 'getTodoPagination', 'getUsers' ] ),

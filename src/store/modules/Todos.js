@@ -2,6 +2,7 @@ import Vue from 'vue'
 
 const state = {
     Todos         : [],
+    TodosCalendar : [],
     Todo          : {
         _id        : '',
         title      : '',
@@ -26,6 +27,7 @@ const state = {
 }
 const getters = {
     getTodos         : state => state.Todos,
+    getTodosCalendar : state => state.TodosCalendar,
     getTodo          : state => state.Todo,
     getDashboard     : state => state.dashboard,
     getTodoPagination: state => state.todoPagination
@@ -44,6 +46,18 @@ const mutations = {
                 status   : item.status,
                 user     : item.user,
                 createdAt: item.createdAt.replace( 'T', ' ' ).substr( 0, 19 )
+            }
+        } )
+    },
+    setTodosCalendar( state, payload ) {
+        state.TodosCalendar = payload.map( item => {
+            return {
+                _id  : item._id,
+                name : item.title,
+                start: item.createdAt.replace( 'T', ' ' ).substr( 0, 16 ),
+                end  : item.deadline ? item.deadline.replace( 'T', ' ' ).substr( 0, 16 ) : '',
+                color: item.status === 'Pending' ? 'pink lighten-2' : item.status === 'Overdue' ? 'orange' : 'teal lighten-2',
+                timed: false
             }
         } )
     },
@@ -108,6 +122,7 @@ const actions = {
                 if ( res.status === 200 ) {
                     commit( 'setTodoPagination', res.body.response.pagination )
                     commit( 'setTodos', res.body.response.data )
+                    commit( 'setTodosCalendar', res.body.response.data )
                 }
                 return res
             } )
