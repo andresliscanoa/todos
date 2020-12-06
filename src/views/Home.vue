@@ -379,11 +379,11 @@ export default {
     todoCreate     : false,
     todoShow       : false
   }),
-  created() {
-    this.dash()
-    this.filterTodos( true )
-    this.filterCategories()
-    this.usersFilter()
+  async created() {
+    await this.dash()
+    await this.filterTodos( true )
+    await this.filterCategories()
+    await this.usersFilter()
   },
   computed  : {
     ...mapGetters( [ 'getUser', 'getDashboard', 'getCategoriesFilter', 'getTodos', 'getTodoPagination', 'getUsers' ] ),
@@ -400,7 +400,7 @@ export default {
     minEnd() { return this.start ? this.start : '2020-11-01' }
   },
   methods   : {
-    ...mapMutations( [ 'setConfirmAlert', 'setErrorAlert', 'setAlertOff', 'setTodo', 'starting' ] ),
+    ...mapMutations( [ 'setConfirmAlert', 'setErrorAlert', 'setAlertOff', 'setTodo' ] ),
     ...mapActions( [ 'getTodoDashboard', 'findCategoriesByUser', 'getTodosByFilters', 'getTodoById', 'updateTodosStatus', 'deleteTodos', 'findUsers' ] ),
     async dash() {
       await this.getTodoDashboard( this.user._id )
