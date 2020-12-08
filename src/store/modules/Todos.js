@@ -57,7 +57,10 @@ const mutations = {
                 start: item.start ? item.start.replace( 'T', ' ' ).substr( 0, 16 ) : item.createdAt.replace( 'T', ' ' ).substr( 0, 16 ),
                 end  : item.deadline ? item.deadline.replace( 'T', ' ' ).substr( 0, 16 ) : '',
                 color: item.status === 'Pending' ? 'pink lighten-2' : item.status === 'Overdue' ? 'orange' : 'teal lighten-2',
-                timed: false
+                timed: false,
+                user : {
+                    _id: item.user._id
+                }
             }
         } )
     },

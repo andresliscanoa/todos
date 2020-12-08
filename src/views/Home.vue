@@ -284,7 +284,7 @@
         </v-flex>
       </v-layout>
       <v-flex v-show="calendarViews" xs12>
-        <todo-calendar/>
+        <todo-calendar @openTodoDialogShow="openTodoDialogShow($event)"/>
       </v-flex>
       <v-flex v-show="!calendarViews" xs12>
         <v-layout justify-end row wrap>

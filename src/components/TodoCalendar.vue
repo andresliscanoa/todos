@@ -171,21 +171,7 @@ export default {
       this.$refs.calendar.next()
     },
     showEvent( { nativeEvent, event } ) {
-      const open = () => {
-        this.selectedEvent = event
-        this.selectedElement = nativeEvent.target
-        setTimeout( () => {
-          this.selectedOpen = true
-        }, 10 )
-      }
-
-      if ( this.selectedOpen ) {
-        this.selectedOpen = false
-        setTimeout( open, 10 )
-      } else {
-        open()
-      }
-
+      this.$emit( 'openTodoDialogShow', event )
       nativeEvent.stopPropagation()
     }
   }
